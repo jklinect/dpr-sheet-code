@@ -37,6 +37,7 @@ function calculate_to_crit(advantage, disadvantage) {
          disadvantage ? 0.05**2 :
          0.05;
 }
+
 function calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage) {
   var success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
   var failure_chance = 1.0 - success_chance;
@@ -56,36 +57,35 @@ function calculate_dpr(num_attacks,
                        attack_damage,
                        extra_attack_damage = "",
                        extra_turn_damage = "",
-                       extra_attack_tohit = "",
-                       extra_turn_tohit = "",
-                       expected_ac = 0,
+                       extra_attack_to_hit = "",
+                       extra_turn_to_hit = "",
+                       challenge_ac = "0",
                        min_dmg = false,
                        max_dmg = false,
                        advantage = false,
                        disadvantage = false) 
 {
-  var crit_damage           = parseDamage(attack_damage, true, min_dmg, max_dmg);
-  var base_damage           = parseDamage(attack_damage, false, min_dmg, max_dmg);
-  var per_attack_crit_bonus = parseDamage(extra_attack_damage, true, min_dmg, max_dmg);
-  var per_attack_bonus      = parseDamage(extra_attack_damage, false, min_dmg, max_dmg);
-  var per_turn_crit_bonus   = parseDamage(extra_turn_damage, true, min_dmg, max_dmg);
-  var per_turn_bonus        = parseDamage(extra_turn_damage, false, min_dmg, max_dmg);
-  var extra_attack_tohit    = parseDamage(extra_attack_tohit, false, min_dmg, max_dmg);
-  var extra_turn_tohit      = parseDamage(extra_turn_tohit, false, min_dmg, max_dmg);
-  var dpr = 0.0;
-  expected_ac = parseInt(expected_ac)
+  const crit_damage           = parseDamage(attack_damage, true, min_dmg, max_dmg);
+  const base_damage           = parseDamage(attack_damage, false, min_dmg, max_dmg);
+  const per_attack_crit_bonus = parseDamage(extra_attack_damage, true, min_dmg, max_dmg);
+  const per_attack_bonus      = parseDamage(extra_attack_damage, false, min_dmg, max_dmg);
+  const per_turn_crit_bonus   = parseDamage(extra_turn_damage, true, min_dmg, max_dmg);
+  const per_turn_bonus        = parseDamage(extra_turn_damage, false, min_dmg, max_dmg);
+  const extra_attack_tohit    = parseDamage(extra_attack_to_hit, false, min_dmg, max_dmg);
+  const extra_turn_tohit      = parseDamage(extra_turn_to_hit, false, min_dmg, max_dmg);
+  let dpr = 0.0;
+  const expected_ac = parseInt(challenge_ac)
   // expected attack has 65% chance to hit:
   // 5% chance to do critical hit
   // 60% chance to do a normal hit (to_hit modifiers may adjust this)
   // dpr = damages multiplied by those percentages
   // dpr = (crit damage * crit chance) + (normal damage * normal chance)
-  var to_crit_chance = calculate_to_crit(advantage, disadvantage);
-  var to_hit_chance = calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage);
+  const to_crit_chance = calculate_to_crit(advantage, disadvantage);
+  let to_hit_chance: number = calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage);
   dpr = (crit_damage + per_attack_crit_bonus + per_turn_crit_bonus) * to_crit_chance + 
         (base_damage + per_attack_bonus + per_turn_bonus) * Math.min(to_hit_chance, 0.90);
   // subsequent attacks (no extra_turn_tohit applied)
-  if (num_attacks > 1) {
-    num_attacks--;
+  if (--num_attacks > 1) {
     to_hit_chance = calculate_to_hit(to_hit, extra_attack_tohit, 0, expected_ac, advantage, disadvantage)
     dpr += num_attacks * ((crit_damage + per_attack_crit_bonus) * to_crit_chance + 
                           (base_damage + per_attack_bonus)      * Math.min(to_hit_chance, 0.90));
@@ -107,11 +107,11 @@ function calculate_spell_damage(spell_dc,
   var half_chance = no_damage_on_save ? 0.0 : 1 - full_chance;
   var half_damage = 0.5 * parseDamage(attack_damage, false);  // unless there's non-dice figures, this is fine
   var extra_damage = parseDamage(extra_attack_damage, false);
-  var extra_turn_damage = parseDamage(extra_turn_damage, false);
+  var extra_onetime_damage = parseDamage(extra_turn_damage, false);
   var dpr = full_chance * (full_damage + extra_damage) + half_chance * (half_damage + extra_attack_damage);
   // either all-or-nothing (full only), or 100% chance (full and half)
   // to apply the extra turn damage here at the end
-  dpr += (full_chance + half_chance) * extra_turn_damage;
+  dpr += (full_chance + half_chance) * extra_onetime_damage;
   return 0;
 }
 
@@ -149,8 +149,4 @@ function groupRowsByColumnValue(tabName, specialColumn) {
 
 function modifySheet() {
   groupRowsByColumnValue("🎓 Breckenridge DPRs", "Character");
-  // groupRowsByColumnValue("🥷 Rogue One DPRs", "Character");
-  // groupRowsByColumnValue("⛏️ Deep Gnome DPRs", "Character");
-  // groupRowsByColumnValue("🔪 A Deadly Deal DPRs", "Character");
-  // groupRowsByColumnValue("🤡 noobpen", "Character");
 }
