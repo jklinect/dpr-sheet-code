@@ -148,34 +148,41 @@ export function calculate_dpr(num_attacks,
 /**
  * This function calculates the spell damage based on various parameters.
  *
- * @param {number} spell_dc - The spell's difficulty class.
- * @param {number} attack_damage - The base damage of the attack.
- * @param {number} extra_attack_damage - The additional damage applied once per hit.
- * @param {number} extra_turn_damage - The additional damage applied once a turn.
+ * @param {number} spell_dc - The spell's check DC.
+ * @param {string} attack_damage - The base damage of the attack.
+ * @param {string} extra_attack_damage - The additional damage applied once per hit.
+ * @param {string} extra_turn_damage - The additional damage applied once a turn.
  * @param {boolean} no_damage_on_save - If true, a save results in no damage.
- * @param {number} expected_save - The expected save roll.
+ * @param {number} expected_save - The expected save roll modifier.
+ * @param {number} number_of_targets - The number of targets affected.
  * @returns {number} The calculated spell damage.
  */
-function calculate_spell_damage(spell_dc,
-                                attack_damage,
-                                extra_attack_damage,
-                                extra_turn_damage,
-                                no_damage_on_save = false,
-                                expected_save = 0)
+export function calculate_spell_damage(spell_dc,
+                                       attack_damage,
+                                       extra_attack_damage,
+                                       extra_turn_damage,
+                                       no_damage_on_save = false,
+                                       expected_save = 0,
+                                       number_of_targets = 1)
 {
   // spell damage is:
-  // (chance for full damage)*(full damage) - (1 - (chance for full damage))*(half damage)
+  // (chance for full damage)*(full damage) + (1 - (chance for full damage))*(half damage)
+  // y = 1 - x
+  // call it x*full + y*half
+  //  => x*full + y*(full*0.5)
+  //  => full*(0.5y + x)
+  //  => full*(0.5(1 - x) + x)
+  //  => full*(0.5 - 0.5x + x)
+  //  => full*(0.5 + 0.5x)
+  //  => full*0.5(1 + x)
   var full_chance = (20 - spell_dc + expected_save)/20;
   var full_damage = parseDamage(attack_damage, false);
   var half_chance = no_damage_on_save ? 0.0 : 1 - full_chance;
-  var half_damage = 0.5 * full_damage;  // unless there's non-dice figures, this is fine
   var extra_damage = parseDamage(extra_attack_damage, false);
   var extra_onetime_damage = parseDamage(extra_turn_damage, false);
-  var dpr = full_chance * (full_damage + extra_damage) + half_chance * (half_damage + extra_attack_damage);
+  var dpr = (full_chance + half_chance * 0.5) * (full_damage + extra_damage + extra_onetime_damage);
   // either all-or-nothing (full only), or 100% chance (full and half)
-  // to apply the extra turn damage here at the end
-  dpr += (full_chance + half_chance) * extra_onetime_damage;
-  return 0;
+  return dpr * number_of_targets;
 }
 
 /**
