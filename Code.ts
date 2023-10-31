@@ -1,4 +1,4 @@
-function parseDamage(input, critical, min_only = false, max_only = false) {
+export function parseDamage(input, critical, min_only = false, max_only = false) {
   var diceRegex = /(\d+)d(\d+)/gm;
   var match;
   var roll = 0;
