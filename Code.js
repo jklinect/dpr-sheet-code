@@ -9,7 +9,7 @@ function parseDamage(input, critical, min_only = false, max_only = false) {
   while (match = diceRegex.exec(input)) {
     var count = parseInt(match[1]);
     var sides = parseInt(match[2]);
-    if (critical == true) {
+    if (critical) {
       count *= 2;
     }
     for (var i = 0; i < count; i++) {
