@@ -47,4 +47,14 @@ describe('parseDamage', () => {
       expect(result).toBe(correct);
     }
   });
+
+  it('should correctly handle "==" in the string', () => {
+    const damage = `1d6 + 10 sharpshooter
+    + 1d4 favored foe
+    ==
+    1d6 + 1d4 + 10`
+    const result = parseDamage(damage, false, false, false);
+    const correct = 16;
+    expect(result).toBe(correct);
+  });
 });

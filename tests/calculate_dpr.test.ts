@@ -1,0 +1,177 @@
+import { calculate_dpr } from "../Code";
+
+describe('calculate_dpr', () => {
+  it('fist (+0) on skin (AC10)', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d6", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 2.1;
+    expect(result).toBe(correct);
+  });
+
+  it('fist (+0) on skin (AC10), advantage', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d6", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      true,  // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 3.1325; // 0.7*3.5 + 0.0975*7
+    expect(result).toBeCloseTo(correct, 2);
+  });
+
+  it('fist (+0) on skin (AC10), disadvantage', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d6", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      true   // disadvantage on dice rolls
+    );
+    const correct = 1.07625; // (1-0.6975)*3.5 + 0.0025*7
+    expect(result).toBeCloseTo(correct);
+  });
+
+  it('two swords (+2) on studded leather (AC12)', () => {
+    const result = calculate_dpr(
+      2,     // # attacks
+      2,     // to-hit
+      "1d6", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "12",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 4.2;
+    expect(result).toBe(correct);
+  });
+
+  it('two swords (+3/+2) on studded leather (AC12)', () => {
+    const result = calculate_dpr(
+      2,     // # attacks
+      2,     // to-hit
+      "1d6", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "+1",  // extra to-hit per-turn
+      "12",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 2.1 + 2.28;
+    expect(result).toBeCloseTo(correct);
+  });
+
+  it('hand xbow (+0) on skin (AC10), sharpshooter', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d6", // attack damage
+      "+10", // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    // 0.50*(3.5+10) + 0.05*(7+10)
+    const correct = 7.6;
+    expect(result).toBe(correct);
+  });
+
+  it('3x hand xbow (+0) on skin (AC10), sharpshooter (+10), favored foe (1d4)', () => {
+    const result = calculate_dpr(
+      3,     // # attacks
+      0,     // to-hit
+      "1d6", // attack damage
+      "+10", // extra per-hit damage
+      "1d4", // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    // 3*(0.50*(3.5+10) + 0.05*(7+10)) + (0.50*2.5 + 0.05*5)
+    const correct = 24.3;
+    expect(result).toBeCloseTo(correct);
+  });
+
+  it('max dmg rolls: warhammer (+0) on skin (AC10)', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d10", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      true,  // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 6; // 0.5*10 + 0.05*20
+    expect(result).toBe(correct);
+  });
+
+  it('min dmg rolls: dagger (+0) on skin (AC10)', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d4", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      true,  // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 0.6; // 0.5*1 + 0.05*2
+    expect(result).toBe(correct);
+  });
+
+});
