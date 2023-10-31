@@ -168,7 +168,7 @@ function calculate_spell_damage(spell_dc,
   var full_chance = (20 - spell_dc + expected_save)/20;
   var full_damage = parseDamage(attack_damage, false);
   var half_chance = no_damage_on_save ? 0.0 : 1 - full_chance;
-  var half_damage = 0.5 * parseDamage(attack_damage, false);  // unless there's non-dice figures, this is fine
+  var half_damage = 0.5 * full_damage;  // unless there's non-dice figures, this is fine
   var extra_damage = parseDamage(extra_attack_damage, false);
   var extra_onetime_damage = parseDamage(extra_turn_damage, false);
   var dpr = full_chance * (full_damage + extra_damage) + half_chance * (half_damage + extra_attack_damage);
@@ -185,7 +185,7 @@ function calculate_spell_damage(spell_dc,
  * @param {string} specialColumn - The column to group rows by.
  * @returns {void}
  */
-function groupRowsByColumnValue(tabName, specialColumn) {
+function groupRowsByColumnValue(tabName: string, specialColumn: string): void {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(tabName);
   
   let lr = sheet.getDataRange().getLastRow();
@@ -223,6 +223,12 @@ function groupRowsByColumnValue(tabName, specialColumn) {
  *
  * @returns {void} No return value.
  */
-function modifySheet() {
-  groupRowsByColumnValue("🎓 Breckenridge DPRs", "Character");
+function modifySheet(): void {
+  const campaigns: string[] = [
+    "🔪 A Deadly Deal DPRs",
+    "🗼 Clockwise Tower DPRs",
+    "🏫 Breckenridge 3 DPRs"
+  ]
+  for (let campaign of campaigns)
+    groupRowsByColumnValue(campaign, "Character");
 }
