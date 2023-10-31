@@ -174,4 +174,11 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
+  it('multiple attacks (1-12)', () => {
+    for (let i = 1; i <= 12; i++) {
+      const result = calculate_dpr(i, 0, "1d6", "", "", "", "", "10", false, false, false, false);
+      const correct = i * 2.1;
+      expect(result).toBeCloseTo(correct);
+    }
+  });
 });
