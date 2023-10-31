@@ -6,14 +6,20 @@ The workbook is available [here](https://docs.google.com/spreadsheets/d/1WTOgF6m
 
 ## Setting up
 
+Set up the node environment:
 ```
-$ npm i
+$ npm install
+```
+
+Set up the `clasp` configuration:
+```
+$ clasp clone projectID
 ```
 
 ## Running tests
 
 ```
-$ npx jest
+$ npm run test
 ```
 
 ## Pushing changes up
@@ -26,8 +32,9 @@ $ clasp push
 
 Things that were handy setting this up:
 
-https://developers.google.com/apps-script/guides/clasp
-
-https://developers.googleblog.com/2015/12/advanced-development-process-with-apps.html
-
-https://developers.google.com/apps-script/guides/typescript
+* https://developers.google.com/apps-script/guides/clasp
+* https://developers.google.com/apps-script/guides/typescript
+* https://developers.googleblog.com/2015/12/advanced-development-process-with-apps.html
+* https://github.com/google/clasp/blob/master/docs/typescript.md
+* https://rpgbot.net/dnd5/tools/dpr-calculator/
+* https://stackoverflow.com/questions/48791868/use-typescript-with-google-apps-s
