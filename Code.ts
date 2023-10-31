@@ -32,16 +32,17 @@ export function parseDamage(input, critical, min_only = false, max_only = false)
   return roll;
 }
 
-function calculate_to_crit(advantage, disadvantage) {
+export function calculate_to_crit(advantage, disadvantage) {
   return advantage    ? 1.0 - 0.95**2 :
          disadvantage ? 0.05**2 :
          0.05;
 }
 
-function calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage) {
+export function calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage) {
   var success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
   var failure_chance = 1.0 - success_chance;
   if (advantage) {
+    // 0.9025 = 1 - 0.0975
     return 0.9025 - (failure_chance * failure_chance);
   }
   else if (disadvantage) {
