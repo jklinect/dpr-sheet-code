@@ -13,7 +13,7 @@ export const parseDamage = (input, critical, min_only = false, max_only = false)
   let roll = 0;
   if (String(input).indexOf("==") > -1) {
     input = input.split("==");
-    input = input[input.length - 1]
+    input = input[input.length - 1];
   }
   while (match = diceRegex.exec(input)) {
     let count = parseInt(match[1]);
@@ -129,7 +129,7 @@ export const calculate_dpr = (num_attacks,
   const extra_attack_tohit    = parseDamage(extra_attack_to_hit, false, min_dmg, max_dmg);
   const extra_turn_tohit      = parseDamage(extra_turn_to_hit, false, min_dmg, max_dmg);
   let dpr = 0.0;
-  const expected_ac = parseInt(challenge_ac)
+  const expected_ac = parseInt(challenge_ac);
   // expected attack has 65% chance to hit:
   // 5% chance to do critical hit
   // 60% chance to do a normal hit (to_hit modifiers may adjust this)
@@ -141,7 +141,7 @@ export const calculate_dpr = (num_attacks,
         (base_damage + per_attack_bonus + per_turn_bonus) * Math.min(to_hit_chance, 0.90);
   // subsequent attacks (no extra_turn_tohit applied)
   if (--num_attacks > 0) {
-    to_hit_chance = calculate_to_hit(to_hit, extra_attack_tohit, 0, expected_ac, advantage, disadvantage)
+    to_hit_chance = calculate_to_hit(to_hit, extra_attack_tohit, 0, expected_ac, advantage, disadvantage);
     dpr += num_attacks * ((crit_damage + per_attack_crit_bonus) * to_crit_chance + 
                           (base_damage + per_attack_bonus)      * Math.min(to_hit_chance, 0.90));
   }
@@ -219,7 +219,7 @@ export const groupRowsByColumnValue = (tabName: string, specialColumn: string): 
     var cellValue = values[i][columnToGroup - 1] + "-" + values[i][columnToGroup];
     
     if (!groupedRows[cellValue]) {
-      groupedRows[cellValue] = 1
+      groupedRows[cellValue] = 1;
     }
     else {
       var newRange = sheet.getRange(i + 1, 1);
