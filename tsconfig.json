@@ -3,6 +3,10 @@
         "lib": [
             "esnext"
         ],
-        "experimentalDecorators": true
-    }
+        "experimentalDecorators": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "./*.ts"
+      ],
 }
