@@ -4,7 +4,8 @@
             "esnext"
         ],
         "experimentalDecorators": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "esModuleInterop": true
     },
     "include": [
         "./*.ts"

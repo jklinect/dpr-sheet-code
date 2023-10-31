@@ -16,11 +16,20 @@ describe('parseDamage', () => {
     }
   });
   
-  it('should correctly parse additive damage (+/-)', () => {
+  it('should correctly parse additive damage (+, -)', () => {
     const plus = parseDamage('1d8 + 4', false, false, false);
     expect(plus).toBe(8.5);
     const minus = parseDamage('1d10 - 4', false, false, false);
     expect(minus).toBe(1.5);
+  });
+
+  it('should correctly handle multipliers (*, /, ^)', () => {
+    const plus = parseDamage('1d8 * 2', false, false, false);
+    expect(plus).toBe(9);
+    const minus = parseDamage('2d10 / 11', false, false, false);
+    expect(minus).toBe(1);
+    const power = parseDamage('2d4 ^ 2', false, false, false);
+    expect(power).toBe(25);
   });
 
   it('should correctly handle min rolls with 1', () => {
@@ -53,6 +62,15 @@ describe('parseDamage', () => {
     + 1d4 favored foe
     ==
     1d6 + 1d4 + 10`
+    const result = parseDamage(damage, false, false, false);
+    const correct = 16;
+    expect(result).toBe(correct);
+  });
+
+  it('should handle dice/modifiers in any order', () => {
+    const damage = `1d6 base damage
+    + 10 sharpshooter
+    + 1d4 favored foe`
     const result = parseDamage(damage, false, false, false);
     const correct = 16;
     expect(result).toBe(correct);

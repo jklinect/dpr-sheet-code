@@ -8,34 +8,37 @@
  * @returns {number} The expected value of the damage dice.
  */
 export function parseDamage(input, critical, min_only = false, max_only = false) {
-  var diceRegex = /(\d+)d(\d+)/gm;
-  var match;
-  var roll = 0;
+  const diceRegex = /(\d+)d(\d+)/gm;
+  let match;
+  let roll = 0;
   if (String(input).indexOf("==") > -1) {
     input = input.split("==");
     input = input[input.length - 1]
   }
   while (match = diceRegex.exec(input)) {
-    var count = parseInt(match[1]);
-    var sides = parseInt(match[2]);
-    if (critical) {
-      count *= 2;
-    }
-    for (var i = 0; i < count; i++) {
-      // min only? adds 1
-      // max only? adds max roll
-      // otherwise? adds expected (N+1)/2
-      roll += min_only ? 1 : max_only ? sides : (sides + 1) / 2
-    }
+    let count = parseInt(match[1]);
+    const sides = parseInt(match[2]);
+    const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
+    roll += (critical ? 2 * count : count) * damage;
   }
-  var modifierRegex = /([+-])\s*(\d+)$/gm;
+  var modifierRegex = /([+-/\*^])\s*(\d+)($|\s)/gm;
   while (match = modifierRegex.exec(input)) {
     var operator = match[1];
     var value = parseInt(match[2]);
     if (operator === "+") {
       roll += value;
-    } else {
+    }
+    else if (operator === "-") {
       roll -= value;
+    }
+    else if (operator === "*") {
+      roll *= value;
+    }
+    else if (operator === "/") {
+      roll /= value;
+    }
+    else if (operator === "^") {
+      roll **= value;
     }
   }
   return roll;
