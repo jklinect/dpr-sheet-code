@@ -7,7 +7,7 @@
  * @param {boolean} [max_only=false] - Optional. If true, uses the max roll of a dice.
  * @returns {number} The expected value of the damage dice.
  */
-export function parseDamage(input, critical, min_only = false, max_only = false) {
+export const parseDamage = (input, critical, min_only = false, max_only = false) => {
   const diceRegex = /(\d+)d(\d+)/gm;
   let match;
   let roll = 0;
@@ -42,7 +42,7 @@ export function parseDamage(input, critical, min_only = false, max_only = false)
     }
   }
   return roll;
-}
+};
 
 /**
  * Returns the critical hit chance, based on advantage and disadvantage.
@@ -51,11 +51,11 @@ export function parseDamage(input, critical, min_only = false, max_only = false)
  * @param {boolean} disadvantage - Indicates if the roll is disadvantaged.
  * @returns {number} The critical hit chance
  */
-export function calculate_to_crit(advantage, disadvantage) {
+export const calculate_to_crit = (advantage, disadvantage) => {
   return advantage    ? 1.0 - 0.95**2 :
          disadvantage ? 0.05**2 :
          0.05;
-}
+};
 
 /**
  * This function calculates the hit-once chance based on various parameters. It does
@@ -75,7 +75,7 @@ export function calculate_to_crit(advantage, disadvantage) {
  * @param {boolean} disadvantage - Whether disadvantage is applied.
  * @returns {number} The calculated hit chance.
  */
-export function calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage) {
+export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage) => {
   var success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
   var failure_chance = 1.0 - success_chance;
   if (advantage) {
@@ -88,7 +88,7 @@ export function calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, e
   else {
     return success_chance - 0.05;
   }
-}
+};
 
 /**
  * Calculates the damage per round (DPR) based on various parameters.
@@ -107,7 +107,7 @@ export function calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, e
  * @param {boolean} [disadvantage=false] - Optional. If true, disadvantage is considered in the calculation.
  * @returns {type} The given damage as described by the parameters
  */
-export function calculate_dpr(num_attacks,
+export const calculate_dpr = (num_attacks,
                               to_hit,
                               attack_damage,
                               extra_attack_damage = "",
@@ -118,7 +118,7 @@ export function calculate_dpr(num_attacks,
                               min_dmg = false,
                               max_dmg = false,
                               advantage = false,
-                              disadvantage = false)
+                              disadvantage = false) =>
 {
   const crit_damage           = parseDamage(attack_damage, true, min_dmg, max_dmg);
   const base_damage           = parseDamage(attack_damage, false, min_dmg, max_dmg);
@@ -146,7 +146,7 @@ export function calculate_dpr(num_attacks,
                           (base_damage + per_attack_bonus)      * Math.min(to_hit_chance, 0.90));
   }
   return dpr;
-}
+};
 
 /**
  * This function calculates the spell damage based on various parameters.
@@ -160,13 +160,13 @@ export function calculate_dpr(num_attacks,
  * @param {number} number_of_targets - The number of targets affected.
  * @returns {number} The calculated spell damage.
  */
-export function calculate_spell_damage(spell_dc,
+export const calculate_spell_damage = (spell_dc,
                                        attack_damage,
                                        extra_attack_damage,
                                        extra_turn_damage,
                                        no_damage_on_save = false,
                                        expected_save = 0,
-                                       number_of_targets = 1)
+                                       number_of_targets = 1) =>
 {
   // spell damage is:
   // (chance for full damage)*(full damage) + (1 - (chance for full damage))*(half damage)
@@ -186,7 +186,7 @@ export function calculate_spell_damage(spell_dc,
   var dpr = (full_chance + half_chance * 0.5) * (full_damage + extra_damage + extra_onetime_damage);
   // either all-or-nothing (full only), or 100% chance (full and half)
   return dpr * number_of_targets;
-}
+};
 
 /**
  * Groups rows in a table by a specific column value.
@@ -195,7 +195,7 @@ export function calculate_spell_damage(spell_dc,
  * @param {string} specialColumn - The column to group rows by.
  * @returns {void}
  */
-function groupRowsByColumnValue(tabName: string, specialColumn: string): void {
+export const groupRowsByColumnValue = (tabName: string, specialColumn: string): void => {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(tabName);
   
   let lr = sheet.getDataRange().getLastRow();
@@ -226,14 +226,14 @@ function groupRowsByColumnValue(tabName: string, specialColumn: string): void {
       newRange.shiftRowGroupDepth(1);
     }
   }
-}
+};
 
 /**
  * This function groups the various sheets active.
  *
  * @returns {void} No return value.
  */
-function modifySheet(): void {
+export const modifySheet = (): void => {
   const campaigns: string[] = [
     "🔪 A Deadly Deal DPRs",
     "🗼 Clockwise Tower DPRs",
@@ -241,4 +241,4 @@ function modifySheet(): void {
   ]
   for (let campaign of campaigns)
     groupRowsByColumnValue(campaign, "Character");
-}
+};
