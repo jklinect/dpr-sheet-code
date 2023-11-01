@@ -54,7 +54,47 @@ describe('calculate_dpr', () => {
       false, // advantage on dice rolls
       true   // disadvantage on dice rolls
     );
-    const correct = 1.07625; // (1-0.6975)*3.5 + 0.0025*7
+    const correct = 1.0675; // (1 - 0.6975 - 0.0025)*3.5 + 0.0025*7
+    expect(result).toBeCloseTo(correct);
+  });
+
+  it('fist (+0) on skin (AC10), crit on 18+', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d6", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false, // disadvantage on dice rolls
+      18     // minimum crit roll
+    );
+    const correct = 2.45;
+    expect(result).toBe(correct);
+  });
+
+  it('fist (+0) on skin (AC10), crit on 18+, advantage', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d6", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      true,  // advantage on dice rolls
+      false, // disadvantage on dice rolls
+      18     // minimum crit roll
+    );
+    const correct = 3.7625; // (1-0.2025-0.2775)*3.5 + 0.2775*7
     expect(result).toBeCloseTo(correct);
   });
 

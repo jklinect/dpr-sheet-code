@@ -24,12 +24,33 @@ describe('calculate_to_hit', () => {
   it('should handle advantage correctly', () => {
     const result = calculate_to_hit(0, 0, 0, 10, true, false);
     const correct = 0.70;
-    expect(result).toBe(correct);
+    expect(result).toBeCloseTo(correct, 10);
   });
   
   it('should handle disadvantage correctly', () => {
     const result = calculate_to_hit(0, 0, 0, 10, false, true);
-    const correct = 0.3025;
+    const correct = 0.30; // 1 - 0.6975 - 0.0025
     expect(result).toBeCloseTo(correct, 4);
+  });
+
+  it('should handle critical ranges correctly', () => {
+    let result = calculate_to_hit(0, 0, 0, 10, false, false, 19);
+    let correct = 0.45;
+    expect(result).toBeCloseTo(correct);
+    result = calculate_to_hit(0, 0, 0, 10, false, false, 18);
+    correct = 0.40;
+    expect(result).toBe(correct);
+  });
+
+  it('should handle critical ranges with advantage', () => {
+    const result = calculate_to_hit(0, 0, 0, 10, true, false, 19);
+    const correct = 0.6075;
+    expect(result).toBeCloseTo(correct, 10);
+  });
+
+  it('should handle critical ranges with disadvantage', () => {
+    const result = calculate_to_hit(0, 0, 0, 10, false, true, 18);
+    const correct = 0.28;
+    expect(result).toBe(correct);
   });
 });

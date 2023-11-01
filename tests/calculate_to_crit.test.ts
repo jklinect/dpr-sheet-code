@@ -18,4 +18,31 @@ describe('calculate_to_crit', () => {
     const correct = 0.0025;
     expect(result).toBeCloseTo(correct, 2);
   });
+
+  it('should handle crits of 18, 19', () => {
+    let result = calculate_to_crit(false, false, 18);
+    let correct = 0.15;
+    expect(result).toBeCloseTo(correct, 2);
+    result = calculate_to_crit(false, false, 19);
+    correct = 0.1;
+    expect(result).toBeCloseTo(correct, 2);
+  });
+
+  it('should handle advantage with critical ranges', () => {
+    let result = calculate_to_crit(true, false, 18);
+    let correct = 0.2775;
+    expect(result).toBeCloseTo(correct, 2);
+    result = calculate_to_crit(true, false, 19);
+    correct = 0.19;
+    expect(result).toBeCloseTo(correct, 2);
+  });
+
+  it('should handle disadvantage with critical ranges', () => {
+    let result = calculate_to_crit(false, true, 18);
+    let correct = 0.0225;
+    expect(result).toBeCloseTo(correct, 2);
+    result = calculate_to_crit(false, true, 19);
+    correct = 0.01;
+    expect(result).toBeCloseTo(correct, 2);
+  });
 });
