@@ -33,6 +33,12 @@ describe('calculate_to_hit', () => {
     expect(result).toBeCloseTo(correct, 4);
   });
 
+  it('should handle elven accuracy correctly', () => {
+    const result = calculate_to_hit(0, 0, 0, 10, false, false, 20, true);
+    const correct = 0.76625; // 1 - 0.45**3 - (1-0.95**3)
+    expect(result).toBeCloseTo(correct);
+  });
+
   it('should handle critical ranges correctly', () => {
     let result = calculate_to_hit(0, 0, 0, 10, false, false, 19);
     let correct = 0.45;
@@ -52,5 +58,11 @@ describe('calculate_to_hit', () => {
     const result = calculate_to_hit(0, 0, 0, 10, false, true, 18);
     const correct = 0.28;
     expect(result).toBe(correct);
+  });
+
+  it('should handle critical ranges with elven accuracy', () => {
+    const result = calculate_to_hit(0, 0, 0, 10, false, false, 18, true);
+    const correct = 1 - 0.45**3 - (1-0.85**3);
+    expect(result).toBeCloseTo(correct);
   });
 });

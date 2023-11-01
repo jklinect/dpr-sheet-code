@@ -58,6 +58,27 @@ describe('calculate_dpr', () => {
     expect(result).toBeCloseTo(correct);
   });
 
+  it('fist (+0) on skin (AC10), elven accuracy', () => {
+    const result = calculate_dpr(
+      1,     // # attacks
+      0,     // to-hit
+      "1d6", // attack damage
+      "",    // extra per-hit damage
+      "",    // extra per-turn damage
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "10",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false, // disadvantage on dice rolls,
+      20,    // min roll to crit
+      true   // elven accuracy on dice rolls
+    );
+    const correct = 3.68025; // 0.7663*3.5 + 0.1426*7
+    expect(result).toBeCloseTo(correct, 2);
+  });
+
   it('fist (+0) on skin (AC10), crit on 18+', () => {
     const result = calculate_dpr(
       1,     // # attacks
