@@ -45,4 +45,16 @@ describe('calculate_to_crit', () => {
     correct = 0.01;
     expect(result).toBeCloseTo(correct, 2);
   });
+
+  it('should handle elven accuracy with major crit values', () => {
+    let result = calculate_to_crit(true, false, 20, true);
+    let correct = 0.142625; // 1-0.95**3
+    expect(result).toBeCloseTo(correct, 2);
+    result = calculate_to_crit(true, false, 19, true);
+    correct = 0.271; // 1-0.90**3
+    expect(result).toBeCloseTo(correct, 2);
+    result = calculate_to_crit(true, false, 18, true);
+    correct = 0.385875; // 1-0.85**3
+    expect(result).toBeCloseTo(correct, 2);
+  });
 });

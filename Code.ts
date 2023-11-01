@@ -50,14 +50,16 @@ export const parseDamage = (input, critical, min_only = false, max_only = false)
  * @param {boolean} advantage - Indicates if the roll is advantaged.
  * @param {boolean} disadvantage - Indicates if the roll is disadvantaged.
  * @param {number} min_crit - The minimum roll on a D20 to score a critical.
+ * @param {boolean} elven_accuracy - Whether elven accuracy is applied.
  * @returns {number} The critical hit chance
  */
-export const calculate_to_crit = (advantage, disadvantage, min_crit = 20) => {
+export const calculate_to_crit = (advantage, disadvantage, min_crit = 20, elven_accuracy = false) => {
   const success = (21 - min_crit) / 20;
   const failure = 1.0 - success;
-  return advantage    ? 1.0 - failure**2 :
-         disadvantage ? success**2 :
-         success;
+  return elven_accuracy ? 1.0 - failure**3 :
+         advantage      ? 1.0 - failure**2 :
+         disadvantage   ? success**2 :
+                          success;
 };
 
 /**
@@ -77,14 +79,18 @@ export const calculate_to_crit = (advantage, disadvantage, min_crit = 20) => {
  * @param {boolean} advantage - Whether advantage is applied.
  * @param {boolean} disadvantage - Whether disadvantage is applied.
  * @param {number} min_crit - The minimum roll on a D20 to score a critical.
+ * @param {boolean} elven_accuracy - Whether elven accuracy is applied.
  * @returns {number} The calculated hit chance.
  */
-export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage, min_crit = 20) => {
+export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage, min_crit = 20, elven_accuracy = false) => {
   var success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
   var failure_chance = 1.0 - success_chance;
-  var crit_chance    = calculate_to_crit(advantage, disadvantage, min_crit);
+  var crit_chance    = calculate_to_crit(advantage, disadvantage, min_crit, elven_accuracy);
   if (advantage) {
-    return 1 - (failure_chance * failure_chance) - crit_chance;
+    return 1 - (failure_chance ** 2) - crit_chance;
+  }
+  else if (elven_accuracy) {
+    return 1 - (failure_chance ** 3) - crit_chance;
   }
   else if (disadvantage) {
     return success_chance**2 - crit_chance;
@@ -124,7 +130,8 @@ export const calculate_dpr = (num_attacks,
                               max_dmg = false,
                               advantage = false,
                               disadvantage = false,
-                              min_crit = 20) =>
+                              min_crit = 20,
+                              elven_accuracy = false) =>
 {
   const crit_damage           = parseDamage(attack_damage, true, min_dmg, max_dmg);
   const base_damage           = parseDamage(attack_damage, false, min_dmg, max_dmg);
@@ -137,13 +144,13 @@ export const calculate_dpr = (num_attacks,
   let dpr = 0.0;
   const expected_ac = parseInt(challenge_ac);
   // dpr = (crit damage * crit chance) + (normal damage * normal chance)
-  const to_crit_chance = calculate_to_crit(advantage, disadvantage, min_crit);
-  let to_hit_chance: number = calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage, min_crit);
+  const to_crit_chance = calculate_to_crit(advantage, disadvantage, min_crit, elven_accuracy);
+  let to_hit_chance: number = calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage, min_crit, elven_accuracy);
   dpr = (crit_damage + per_attack_crit_bonus + per_turn_crit_bonus) * to_crit_chance + 
         (base_damage + per_attack_bonus + per_turn_bonus) * Math.min(to_hit_chance, 0.90);
   // subsequent attacks (no extra_turn_tohit applied)
   if (--num_attacks > 0) {
-    to_hit_chance = calculate_to_hit(to_hit, extra_attack_tohit, 0, expected_ac, advantage, disadvantage, min_crit);
+    to_hit_chance = calculate_to_hit(to_hit, extra_attack_tohit, 0, expected_ac, advantage, disadvantage, min_crit, elven_accuracy);
     dpr += num_attacks * ((crit_damage + per_attack_crit_bonus) * to_crit_chance + 
                           (base_damage + per_attack_bonus)      * Math.min(to_hit_chance, 0.90));
   }
