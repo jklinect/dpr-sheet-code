@@ -49,12 +49,15 @@ export const parseDamage = (input, critical, min_only = false, max_only = false)
  *
  * @param {boolean} advantage - Indicates if the roll is advantaged.
  * @param {boolean} disadvantage - Indicates if the roll is disadvantaged.
+ * @param {number} min_crit - The minimum roll on a D20 to score a critical.
  * @returns {number} The critical hit chance
  */
-export const calculate_to_crit = (advantage, disadvantage) => {
-  return advantage    ? 1.0 - 0.95**2 :
-         disadvantage ? 0.05**2 :
-         0.05;
+export const calculate_to_crit = (advantage, disadvantage, min_crit = 20) => {
+  const success = (21 - min_crit) / 20;
+  const failure = 1.0 - success;
+  return advantage    ? 1.0 - failure**2 :
+         disadvantage ? success**2 :
+         success;
 };
 
 /**
@@ -73,20 +76,21 @@ export const calculate_to_crit = (advantage, disadvantage) => {
  * @param {number} expected_ac - The expected armor class of the target.
  * @param {boolean} advantage - Whether advantage is applied.
  * @param {boolean} disadvantage - Whether disadvantage is applied.
+ * @param {number} min_crit - The minimum roll on a D20 to score a critical.
  * @returns {number} The calculated hit chance.
  */
-export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage) => {
+export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage, min_crit = 20) => {
   var success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
   var failure_chance = 1.0 - success_chance;
+  var crit_chance    = calculate_to_crit(advantage, disadvantage, min_crit);
   if (advantage) {
-    // 0.9025 = 1 - 0.0975
-    return 0.9025 - (failure_chance * failure_chance);
+    return 1 - (failure_chance * failure_chance) - crit_chance;
   }
   else if (disadvantage) {
-    return success_chance * success_chance;
+    return success_chance**2 - crit_chance;
   }
   else {
-    return success_chance - 0.05;
+    return success_chance - crit_chance;
   }
 };
 
@@ -105,6 +109,7 @@ export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, e
  * @param {boolean} [max_dmg=false] - Optional. If true, only maximum rolls are used in dice roll calculations.
  * @param {boolean} [advantage=false] - Optional. If true, advantage is considered in the calculation.
  * @param {boolean} [disadvantage=false] - Optional. If true, disadvantage is considered in the calculation.
+ * @param {number} min_crit - The minimum roll on a D20 to score a critical.
  * @returns {type} The given damage as described by the parameters
  */
 export const calculate_dpr = (num_attacks,
@@ -118,7 +123,8 @@ export const calculate_dpr = (num_attacks,
                               min_dmg = false,
                               max_dmg = false,
                               advantage = false,
-                              disadvantage = false) =>
+                              disadvantage = false,
+                              min_crit = 20) =>
 {
   const crit_damage           = parseDamage(attack_damage, true, min_dmg, max_dmg);
   const base_damage           = parseDamage(attack_damage, false, min_dmg, max_dmg);
@@ -130,18 +136,14 @@ export const calculate_dpr = (num_attacks,
   const extra_turn_tohit      = parseDamage(extra_turn_to_hit, false, min_dmg, max_dmg);
   let dpr = 0.0;
   const expected_ac = parseInt(challenge_ac);
-  // expected attack has 65% chance to hit:
-  // 5% chance to do critical hit
-  // 60% chance to do a normal hit (to_hit modifiers may adjust this)
-  // dpr = damages multiplied by those percentages
   // dpr = (crit damage * crit chance) + (normal damage * normal chance)
-  const to_crit_chance = calculate_to_crit(advantage, disadvantage);
-  let to_hit_chance: number = calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage);
+  const to_crit_chance = calculate_to_crit(advantage, disadvantage, min_crit);
+  let to_hit_chance: number = calculate_to_hit(to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage, min_crit);
   dpr = (crit_damage + per_attack_crit_bonus + per_turn_crit_bonus) * to_crit_chance + 
         (base_damage + per_attack_bonus + per_turn_bonus) * Math.min(to_hit_chance, 0.90);
   // subsequent attacks (no extra_turn_tohit applied)
   if (--num_attacks > 0) {
-    to_hit_chance = calculate_to_hit(to_hit, extra_attack_tohit, 0, expected_ac, advantage, disadvantage);
+    to_hit_chance = calculate_to_hit(to_hit, extra_attack_tohit, 0, expected_ac, advantage, disadvantage, min_crit);
     dpr += num_attacks * ((crit_damage + per_attack_crit_bonus) * to_crit_chance + 
                           (base_damage + per_attack_bonus)      * Math.min(to_hit_chance, 0.90));
   }
@@ -170,14 +172,6 @@ export const calculate_spell_damage = (spell_dc,
 {
   // spell damage is:
   // (chance for full damage)*(full damage) + (1 - (chance for full damage))*(half damage)
-  // y = 1 - x
-  // call it x*full + y*half
-  //  => x*full + y*(full*0.5)
-  //  => full*(0.5y + x)
-  //  => full*(0.5(1 - x) + x)
-  //  => full*(0.5 - 0.5x + x)
-  //  => full*(0.5 + 0.5x)
-  //  => full*0.5(1 + x)
   var full_chance = (20 - spell_dc + expected_save)/20;
   var full_damage = parseDamage(attack_damage, false);
   var half_chance = no_damage_on_save ? 0.0 : 1 - full_chance;
