@@ -268,7 +268,7 @@ describe('calculate_dpr', () => {
       7,     // to-hit
       "2d6",
       "hex 1d6 sneak attack 2d6",
-      `2x eldritch blast 2d10 + 6
+      `2 eldritch blasts 2d10+6
        extra hex/beam 2d6
        extra sneak attacks 4d6
       `,    // extra to-hit per-turn

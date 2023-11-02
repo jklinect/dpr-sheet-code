@@ -14,7 +14,7 @@ export const parseDamage = (input, critical, min_only = false, max_only = false)
     input = input.split("==");
     input = input[input.length - 1];
   }
-  const diceRegex = /(^|[+-/\*^ ])\s*(\d+)d?(\d*)(?:$|\s)/gm;
+  const diceRegex = /(^|[+-/\*^ ])\s*(\d+)d?(\d*)/gm;
   while (match = diceRegex.exec(input)) {
     const operator = match[1];
     let value = parseInt(match[2]);
@@ -23,7 +23,7 @@ export const parseDamage = (input, critical, min_only = false, max_only = false)
       const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
       value = (critical ? 2 * value : value) * damage;
     }
-    if (! operator || operator === "+" || operator === " ") {
+    if ((! operator && match[3]) || operator === "+" || operator === " ") {
       roll += value;
     }
     else if (operator === "-") {
