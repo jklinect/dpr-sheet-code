@@ -8,24 +8,22 @@
  * @returns {number} The expected value of the damage dice.
  */
 export const parseDamage = (input, critical, min_only = false, max_only = false) => {
-  const diceRegex = /(\d+)d(\d+)/gm;
   let match;
   let roll = 0;
   if (String(input).indexOf("==") > -1) {
     input = input.split("==");
     input = input[input.length - 1];
   }
+  const diceRegex = /(^|[+-/\*^])\s*(\d+)d?(\d*)(?:$|\s)/gm;
   while (match = diceRegex.exec(input)) {
-    let count = parseInt(match[1]);
-    const sides = parseInt(match[2]);
-    const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
-    roll += (critical ? 2 * count : count) * damage;
-  }
-  var modifierRegex = /([+-/\*^])\s*(\d+)($|\s)/gm;
-  while (match = modifierRegex.exec(input)) {
-    var operator = match[1];
-    var value = parseInt(match[2]);
-    if (operator === "+") {
+    const operator = match[1];
+    let value = parseInt(match[2]);
+    if (match[3]) {
+      const sides = parseInt(match[3]);
+      const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
+      value = (critical ? 2 * value : value) * damage;
+    }
+    if (! operator || operator === "+") {
       roll += value;
     }
     else if (operator === "-") {
