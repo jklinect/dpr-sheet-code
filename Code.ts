@@ -88,11 +88,11 @@ export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, e
   var success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
   var failure_chance = 1.0 - success_chance;
   var crit_chance    = calculate_to_crit(advantage, disadvantage, min_crit, elven_accuracy);
-  if (advantage) {
-    return 1 - (failure_chance ** 2) - crit_chance;
-  }
-  else if (elven_accuracy) {
+  if (elven_accuracy) {
     return 1 - (failure_chance ** 3) - crit_chance;
+  }
+  else if (advantage) {
+    return 1 - (failure_chance ** 2) - crit_chance;
   }
   else if (disadvantage) {
     return success_chance**2 - crit_chance;
