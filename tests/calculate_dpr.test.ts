@@ -242,4 +242,23 @@ describe('calculate_dpr', () => {
       expect(result).toBeCloseTo(correct);
     }
   });
+
+  it('complex: bruce vilanch 12x attack', () => {
+    const result = calculate_dpr(
+      12,     // # attacks
+      14,     // to-hit
+      "1d6 + 3d6 + 10",
+      "large sized weapons 1d6",
+      "enlarged extra 1d8",
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "19",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 278.325;
+    expect(result).toBe(correct);
+  });
 });
