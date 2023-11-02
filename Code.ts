@@ -8,24 +8,26 @@
  * @returns {number} The expected value of the damage dice.
  */
 export const parseDamage = (input, critical, min_only = false, max_only = false) => {
-  const diceRegex = /(\d+)d(\d+)/gm;
   let match;
   let roll = 0;
   if (String(input).indexOf("==") > -1) {
     input = input.split("==");
     input = input[input.length - 1];
   }
+  const diceRegex = /(^|[+-/\*^ ])\s*(\d+)d?(\d*)/gm;
   while (match = diceRegex.exec(input)) {
-    let count = parseInt(match[1]);
-    const sides = parseInt(match[2]);
-    const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
-    roll += (critical ? 2 * count : count) * damage;
-  }
-  var modifierRegex = /([+-/\*^])\s*(\d+)($|\s)/gm;
-  while (match = modifierRegex.exec(input)) {
-    var operator = match[1];
-    var value = parseInt(match[2]);
-    if (operator === "+") {
+    const operator = match[1];
+    let value = 0;
+    if (match[3]) {
+      const count = parseInt(match[2]);
+      const sides = parseInt(match[3]);
+      const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
+      value = (critical ? 2 * count : count) * damage;
+    }
+    else {
+      value = parseInt(match[2]);
+    }
+    if ((! operator && match[3]) || operator === "+" || (operator === " " && match[3])) {
       roll += value;
     }
     else if (operator === "-") {
@@ -86,11 +88,11 @@ export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, e
   var success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
   var failure_chance = 1.0 - success_chance;
   var crit_chance    = calculate_to_crit(advantage, disadvantage, min_crit, elven_accuracy);
-  if (advantage) {
-    return 1 - (failure_chance ** 2) - crit_chance;
-  }
-  else if (elven_accuracy) {
+  if (elven_accuracy) {
     return 1 - (failure_chance ** 3) - crit_chance;
+  }
+  else if (advantage) {
+    return 1 - (failure_chance ** 2) - crit_chance;
   }
   else if (disadvantage) {
     return success_chance**2 - crit_chance;

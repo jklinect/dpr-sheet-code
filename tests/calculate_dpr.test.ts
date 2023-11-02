@@ -242,4 +242,69 @@ describe('calculate_dpr', () => {
       expect(result).toBeCloseTo(correct);
     }
   });
+
+  it('complex: bruce vilanch 12x attack', () => {
+    const result = calculate_dpr(
+      12,     // # attacks
+      14,     // to-hit
+      "1d6 + 3d6 + 10",
+      "large sized weapons 1d6",
+      "enlarged extra 1d8",
+      "",    // extra to-hit per-hit
+      "",    // extra to-hit per-turn
+      "19",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 278.325;
+    expect(result).toBe(correct);
+  });
+
+  it('complex: lvl5 sorlock scorching ray/quickened eldritch blast', () => {
+    const result = calculate_dpr(
+      3,     // # attacks
+      7,     // to-hit
+      "2d6",
+      "hex 1d6 sneak attack 2d6",
+      `2 eldritch blasts 2d10+6
+       extra fake level 69 hex/beam 2d6
+       extra sneak attacks 4d6
+      `,    // extra to-hit per-turn
+      "",
+      "",
+      "15",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 63.05;
+    expect(result).toBe(correct);
+  });
+
+  it('complex: DAN\'s ridiculous 7x crossbow barrage', () => {
+    const result = calculate_dpr(
+      7,     // # attacks
+      12,     // to-hit
+      "1d6 + 6",
+      `poison xbow   1d4
+       necrotic bolt 1d6
+       crimson rite  1d4
+       sharpshooter +10`,
+      `favored foe      1d4
+       bonus attack dmg 1d8
+       sneak attack     3d6`,
+      "",
+      "",
+      "19",  // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false  // disadvantage on dice rolls
+    );
+    const correct = 154.525;
+    expect(result).toBeCloseTo(correct);
+  });
 });
