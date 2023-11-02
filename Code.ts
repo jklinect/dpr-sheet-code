@@ -23,7 +23,7 @@ export const parseDamage = (input, critical, min_only = false, max_only = false)
       const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
       value = (critical ? 2 * value : value) * damage;
     }
-    if ((! operator && match[3]) || operator === "+" || operator === " ") {
+    if ((! operator && match[3]) || operator === "+" || (operator === " " && match[3])) {
       roll += value;
     }
     else if (operator === "-") {
