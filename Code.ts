@@ -17,11 +17,15 @@ export const parseDamage = (input, critical, min_only = false, max_only = false)
   const diceRegex = /(^|[+-/\*^ ])\s*(\d+)d?(\d*)/gm;
   while (match = diceRegex.exec(input)) {
     const operator = match[1];
-    let value = parseInt(match[2]);
+    let value = 0;
     if (match[3]) {
+      const count = parseInt(match[2]);
       const sides = parseInt(match[3]);
       const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
-      value = (critical ? 2 * value : value) * damage;
+      value = (critical ? 2 * count : count) * damage;
+    }
+    else {
+      value = parseInt(match[2]);
     }
     if ((! operator && match[3]) || operator === "+" || (operator === " " && match[3])) {
       roll += value;
