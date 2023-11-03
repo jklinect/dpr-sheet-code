@@ -8,4 +8,11 @@ parserOptions:
   ecmaVersion: latest
 plugins:
   - '@typescript-eslint'
-rules: {}
+rules:
+  brace-style: ["error", "stroustrup"]
+  no-tabs: ["error"]
+  no-var: ["error"]
+  prefer-const: ["error"]
+  prefer-numeric-literals: ["error"]
+  quotes: ["error", "double"]
+  eol-last: ["error"]

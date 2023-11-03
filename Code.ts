@@ -86,9 +86,9 @@ export const calculate_to_crit = (advantage: boolean, disadvantage: boolean, min
  * @returns {number} The calculated hit chance.
  */
 export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, expected_ac, advantage, disadvantage, min_crit = 20, elven_accuracy = false) => {
-  var success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
-  var failure_chance = 1.0 - success_chance;
-  var crit_chance    = calculate_to_crit(advantage, disadvantage, min_crit, elven_accuracy);
+  const success_chance = 0.05 + (20 - expected_ac + to_hit + extra_attack_tohit + extra_turn_tohit) / 20;
+  const failure_chance = 1.0 - success_chance;
+  const crit_chance    = calculate_to_crit(advantage, disadvantage, min_crit, elven_accuracy);
   if (elven_accuracy) {
     return 1 - (failure_chance ** 3) - crit_chance;
   }
@@ -134,8 +134,7 @@ export const calculate_dpr = (num_attacks: number,
                               advantage = false,
                               disadvantage = false,
                               min_crit = 20,
-                              elven_accuracy = false) =>
-{
+                              elven_accuracy = false) => {
   const crit_damage           = parseDamage(attack_damage, true, min_dmg, max_dmg);
   const base_damage           = parseDamage(attack_damage, false, min_dmg, max_dmg);
   const per_attack_crit_bonus = parseDamage(extra_attack_damage, true, min_dmg, max_dmg);
@@ -178,16 +177,15 @@ export const calculate_spell_damage = (spell_dc: number,
                                        extra_turn_damage: string,
                                        no_damage_on_save = false,
                                        expected_save = 0,
-                                       number_of_targets = 1) =>
-{
+                                       number_of_targets = 1) => {
   // spell damage is:
   // (chance for full damage)*(full damage) + (1 - (chance for full damage))*(half damage)
-  var full_chance = (20 - spell_dc + expected_save)/20;
-  var full_damage = parseDamage(attack_damage, false);
-  var half_chance = no_damage_on_save ? 0.0 : 1 - full_chance;
-  var extra_damage = parseDamage(extra_attack_damage, false);
-  var extra_onetime_damage = parseDamage(extra_turn_damage, false);
-  var dpr = (full_chance + half_chance * 0.5) * (full_damage + extra_damage + extra_onetime_damage);
+  const full_chance = (20 - spell_dc + expected_save)/20;
+  const full_damage = parseDamage(attack_damage, false);
+  const half_chance = no_damage_on_save ? 0.0 : 1 - full_chance;
+  const extra_damage = parseDamage(extra_attack_damage, false);
+  const extra_onetime_damage = parseDamage(extra_turn_damage, false);
+  const dpr = (full_chance + half_chance * 0.5) * (full_damage + extra_damage + extra_onetime_damage);
   // either all-or-nothing (full only), or 100% chance (full and half)
   return dpr * number_of_targets;
 };
@@ -201,33 +199,33 @@ export const calculate_spell_damage = (spell_dc: number,
  */
 export const groupRowsByColumnValue = (tabName: string, specialColumn: string): void => {
   // eslint-disable-next-line no-undef
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(tabName);
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(tabName);
   
-  let lr = sheet.getDataRange().getLastRow();
+  const lr = sheet.getDataRange().getLastRow();
   
   for (let row = 1; row < lr; row++) {
-    let depth = sheet.getRowGroupDepth(row);
+    const depth = sheet.getRowGroupDepth(row);
     if (depth < 1) continue;
     sheet.getRowGroup(row, depth).remove();
   }
 
-  var dataRange = sheet.getDataRange();
-  var values = dataRange.getValues();
-  var columnToGroup = dataRange.getValues()[0].indexOf(specialColumn) + 1;
-  var numRows = values.length;
+  const dataRange = sheet.getDataRange();
+  const values = dataRange.getValues();
+  const columnToGroup = dataRange.getValues()[0].indexOf(specialColumn) + 1;
+  const numRows = values.length;
   
   // Create an object to store the grouped row ranges
-  var groupedRows = {};
+  const groupedRows = {};
   
   // Iterate through each row and group them by the column value
-  for (var i = 1; i < numRows; i++) {
-    var cellValue = values[i][columnToGroup - 1] + "-" + values[i][columnToGroup];
+  for (let i = 1; i < numRows; i++) {
+    const cellValue = values[i][columnToGroup - 1] + "-" + values[i][columnToGroup];
     
     if (!groupedRows[cellValue]) {
       groupedRows[cellValue] = 1;
     }
     else {
-      var newRange = sheet.getRange(i + 1, 1);
+      const newRange = sheet.getRange(i + 1, 1);
       newRange.shiftRowGroupDepth(1);
     }
   }
@@ -244,6 +242,6 @@ export const modifySheet = (): void => {
     "🗼 Clockwise Tower DPRs",
     "🏫 Breckenridge 3 DPRs"
   ]
-  for (let campaign of campaigns)
+  for (const campaign of campaigns)
     groupRowsByColumnValue(campaign, "Character");
 };
