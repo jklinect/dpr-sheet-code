@@ -1,8 +1,8 @@
 import { calculate_dpr } from "../Code";
-import { expect, describe, it } from '@jest/globals';
+import { expect, describe, it } from "@jest/globals";
 
-describe('calculate_dpr', () => {
-  it('fist (+0) on skin (AC10)', () => {
+describe("calculate_dpr", () => {
+  it("fist (+0) on skin (AC10)", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -21,7 +21,7 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
-  it('fist (+0) on skin (AC10), advantage', () => {
+  it("fist (+0) on skin (AC10), advantage", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -40,7 +40,7 @@ describe('calculate_dpr', () => {
     expect(result).toBeCloseTo(correct, 2);
   });
 
-  it('fist (+0) on skin (AC10), disadvantage', () => {
+  it("fist (+0) on skin (AC10), disadvantage", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -59,7 +59,7 @@ describe('calculate_dpr', () => {
     expect(result).toBeCloseTo(correct);
   });
 
-  it('fist (+0) on skin (AC10), elven accuracy', () => {
+  it("fist (+0) on skin (AC10), elven accuracy", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -80,7 +80,7 @@ describe('calculate_dpr', () => {
     expect(result).toBeCloseTo(correct, 2);
   });
 
-  it('fist (+0) on skin (AC10), crit on 18+', () => {
+  it("fist (+0) on skin (AC10), crit on 18+", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -100,7 +100,7 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
-  it('fist (+0) on skin (AC10), crit on 18+, advantage', () => {
+  it("fist (+0) on skin (AC10), crit on 18+, advantage", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -120,7 +120,7 @@ describe('calculate_dpr', () => {
     expect(result).toBeCloseTo(correct);
   });
 
-  it('two swords (+2) on studded leather (AC12)', () => {
+  it("two swords (+2) on studded leather (AC12)", () => {
     const result = calculate_dpr(
       2,     // # attacks
       2,     // to-hit
@@ -139,7 +139,7 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
-  it('two swords (+3/+2) on studded leather (AC12)', () => {
+  it("two swords (+3/+2) on studded leather (AC12)", () => {
     const result = calculate_dpr(
       2,     // # attacks
       2,     // to-hit
@@ -158,7 +158,7 @@ describe('calculate_dpr', () => {
     expect(result).toBeCloseTo(correct);
   });
 
-  it('hand xbow (+0) on skin (AC10), sharpshooter', () => {
+  it("hand xbow (+0) on skin (AC10), sharpshooter", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -178,7 +178,7 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
-  it('3x hand xbow (+0) on skin (AC10), sharpshooter (+10), favored foe (1d4)', () => {
+  it("3x hand xbow (+0) on skin (AC10), sharpshooter (+10), favored foe (1d4)", () => {
     const result = calculate_dpr(
       3,     // # attacks
       0,     // to-hit
@@ -198,7 +198,7 @@ describe('calculate_dpr', () => {
     expect(result).toBeCloseTo(correct);
   });
 
-  it('max dmg rolls: warhammer (+0) on skin (AC10)', () => {
+  it("max dmg rolls: warhammer (+0) on skin (AC10)", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -217,7 +217,7 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
-  it('min dmg rolls: dagger (+0) on skin (AC10)', () => {
+  it("min dmg rolls: dagger (+0) on skin (AC10)", () => {
     const result = calculate_dpr(
       1,     // # attacks
       0,     // to-hit
@@ -236,7 +236,7 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
-  it('multiple attacks (1-12)', () => {
+  it("multiple attacks (1-12)", () => {
     for (let i = 1; i <= 12; i++) {
       const result = calculate_dpr(i, 0, "1d6", "", "", "", "", "10", false, false, false, false);
       const correct = i * 2.1;
@@ -244,7 +244,7 @@ describe('calculate_dpr', () => {
     }
   });
 
-  it('complex: bruce vilanch 12x attack', () => {
+  it("complex: bruce vilanch 12x attack", () => {
     const result = calculate_dpr(
       12,     // # attacks
       14,     // to-hit
@@ -263,7 +263,7 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
-  it('complex: lvl5 sorlock scorching ray/quickened eldritch blast', () => {
+  it("complex: lvl5 sorlock scorching ray/quickened eldritch blast", () => {
     const result = calculate_dpr(
       3,     // # attacks
       7,     // to-hit
@@ -285,7 +285,7 @@ describe('calculate_dpr', () => {
     expect(result).toBe(correct);
   });
 
-  it('complex: DAN\'s ridiculous 7x crossbow barrage', () => {
+  it("complex: DAN's ridiculous 7x crossbow barrage", () => {
     const result = calculate_dpr(
       7,     // # attacks
       12,     // to-hit
