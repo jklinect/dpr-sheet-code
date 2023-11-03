@@ -1,4 +1,5 @@
 import { calculate_to_hit } from "../Code";
+import { expect, describe, it } from '@jest/globals';
 
 describe('calculate_to_hit', () => {
   it('should return 50% for a flat DC10', () => {

@@ -20,7 +20,7 @@
     "build-fresh": "npm cache clean --force && npm i && npm run build",
     "watch": "tsc --project tsconfig.json --watch",
     "prepare": "npm run compile",
-    "lint": "npm run check",
+    "lint": "eslint Code.ts tests/*.ts",
     "test": "jest",
     "coverage": "jest --coverage",
     "prettier": "prettier src test --write",
