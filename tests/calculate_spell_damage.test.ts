@@ -1,4 +1,5 @@
 import { calculate_spell_damage } from "../Code";
+import { expect, describe, it } from '@jest/globals';
 
 describe('calculate_spell_damage', () => {
   it('calculate fireball correctly', () => {

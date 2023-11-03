@@ -1,4 +1,5 @@
 import { parseDamage } from '../Code';
+import { expect, describe, it } from '@jest/globals';
 
 describe('parseDamage', () => {
   const dice = {

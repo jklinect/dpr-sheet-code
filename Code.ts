@@ -7,27 +7,28 @@
  * @param {boolean} [max_only=false] - Optional. If true, uses the max roll of a dice.
  * @returns {number} The expected value of the damage dice.
  */
-export const parseDamage = (input, critical, min_only = false, max_only = false) => {
-  let match;
+export const parseDamage = (input: string, critical: boolean, min_only: boolean = false, max_only: boolean = false): number => {
+  let match: RegExpExecArray;
   let roll = 0;
   if (String(input).indexOf("==") > -1) {
-    input = input.split("==");
-    input = input[input.length - 1];
+    const formula = input.split("==");
+    input = formula[formula.length - 1];
   }
-  const diceRegex = /(^|[+-/\*^ ])\s*(\d+)d?(\d*)/gm;
-  while (match = diceRegex.exec(input)) {
+  const diceRegex = /(^|[+-/*^ ])\s*(\d+)d?(\d*)/gm;
+  while ((match = diceRegex.exec(input))) {
     const operator = match[1];
+    const count = parseInt(match[2]);
     let value = 0;
     if (match[3]) {
-      const count = parseInt(match[2]);
       const sides = parseInt(match[3]);
       const damage = (min_only ? 1 : max_only ? sides : (sides + 1) / 2);
       value = (critical ? 2 * count : count) * damage;
     }
     else {
-      value = parseInt(match[2]);
+      value = count;
     }
-    if ((! operator && match[3]) || operator === "+" || (operator === " " && match[3])) {
+    const implied_addition = !operator || operator === " ";
+    if ((implied_addition && match[3]) || operator === "+") {
       roll += value;
     }
     else if (operator === "-") {
@@ -55,7 +56,7 @@ export const parseDamage = (input, critical, min_only = false, max_only = false)
  * @param {boolean} elven_accuracy - Whether elven accuracy is applied.
  * @returns {number} The critical hit chance
  */
-export const calculate_to_crit = (advantage, disadvantage, min_crit = 20, elven_accuracy = false) => {
+export const calculate_to_crit = (advantage: boolean, disadvantage: boolean, min_crit = 20, elven_accuracy = false) => {
   const success = (21 - min_crit) / 20;
   const failure = 1.0 - success;
   return elven_accuracy ? 1.0 - failure**3 :
@@ -107,7 +108,7 @@ export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, e
  *
  * @param {number} num_attacks - The number of attacks.
  * @param {number} to_hit - The base 'to hit' value.
- * @param {number} attack_damage - The base attack damage.
+ * @param {string} attack_damage - The base attack damage.
  * @param {string} [extra_attack_damage=""] - Optional. Extra damage applied on each attack.
  * @param {string} [extra_turn_damage=""] - Optional. Extra damage applied once a turn.
  * @param {string} [extra_attack_to_hit=""] - Optional. Extra 'to hit' modifier for each attack.
@@ -120,9 +121,9 @@ export const calculate_to_hit = (to_hit, extra_attack_tohit, extra_turn_tohit, e
  * @param {number} min_crit - The minimum roll on a D20 to score a critical.
  * @returns {type} The given damage as described by the parameters
  */
-export const calculate_dpr = (num_attacks,
-                              to_hit,
-                              attack_damage,
+export const calculate_dpr = (num_attacks: number,
+                              to_hit: number,
+                              attack_damage: string,
                               extra_attack_damage = "",
                               extra_turn_damage = "",
                               extra_attack_to_hit = "",
@@ -171,10 +172,10 @@ export const calculate_dpr = (num_attacks,
  * @param {number} number_of_targets - The number of targets affected.
  * @returns {number} The calculated spell damage.
  */
-export const calculate_spell_damage = (spell_dc,
-                                       attack_damage,
-                                       extra_attack_damage,
-                                       extra_turn_damage,
+export const calculate_spell_damage = (spell_dc: number,
+                                       attack_damage: string,
+                                       extra_attack_damage: string,
+                                       extra_turn_damage: string,
                                        no_damage_on_save = false,
                                        expected_save = 0,
                                        number_of_targets = 1) =>
@@ -199,6 +200,7 @@ export const calculate_spell_damage = (spell_dc,
  * @returns {void}
  */
 export const groupRowsByColumnValue = (tabName: string, specialColumn: string): void => {
+  // eslint-disable-next-line no-undef
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(tabName);
   
   let lr = sheet.getDataRange().getLastRow();
