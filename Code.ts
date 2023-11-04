@@ -121,20 +121,21 @@ export const calculateToHit = (toHit: number, extraAttackToHit: number, extraTur
  * @param {number} minCrit - The minimum roll on a D20 to score a critical.
  * @returns {number} The given damage as described by the parameters
  */
-export const calculateDpr = (numAttacks: number,
-                             toHit: number,
-                             attackDamage: string,
-                             extraAttackDamage: string = "",
-                             extraTurnDamage: string = "",
-                             extraAttackModifier: string = "",
-                             extraTurnModifier: string = "",
-                             challengeAc: string = "0",
-                             minDmg: boolean = false,
-                             maxDmg: boolean = false,
-                             advantage: boolean = false,
-                             disadvantage: boolean = false,
-                             minCrit: number = 20,
-                             elvenAccuracy = false): number => {
+// eslint-disable-next-line camelcase
+export const calculate_dpr = (numAttacks: number,
+                              toHit: number,
+                              attackDamage: string,
+                              extraAttackDamage: string = "",
+                              extraTurnDamage: string = "",
+                              extraAttackModifier: string = "",
+                              extraTurnModifier: string = "",
+                              challengeAc: string = "0",
+                              minDmg: boolean = false,
+                              maxDmg: boolean = false,
+                              advantage: boolean = false,
+                              disadvantage: boolean = false,
+                              minCrit: number = 20,
+                              elvenAccuracy = false): number => {
   const critDamage           = parseDamage(attackDamage, true, minDmg, maxDmg);
   const baseDamage           = parseDamage(attackDamage, false, minDmg, maxDmg);
   const perAttackCritBonus   = parseDamage(extraAttackDamage, true, minDmg, maxDmg);
@@ -245,6 +246,3 @@ export const modifySheet = (): void => {
   for (const campaign of campaigns)
     groupRowsByColumnValue(campaign, "Character");
 };
-
-// eslint-disable-next-line camelcase
-export const calculate_dpr = calculateDpr;
