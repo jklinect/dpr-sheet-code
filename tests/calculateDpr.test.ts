@@ -1,4 +1,4 @@
-import { calculate_dpr as calculateDpr } from "../Code";
+import { calculateDpr } from "../Code";
 import { expect, describe, it } from "@jest/globals";
 
 describe("calculate_dpr", () => {

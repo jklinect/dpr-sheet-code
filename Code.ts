@@ -56,7 +56,7 @@ export const parseDamage = (input: string, critical: boolean, minOnly: boolean =
  * @param {boolean} elvenAccuracy - Whether elven accuracy is applied.
  * @returns {number} The critical hit chance
  */
-export const calculateToCrit = (advantage: boolean, disadvantage: boolean, minCrit = 20, elvenAccuracy = false) => {
+export const calculateToCrit = (advantage: boolean, disadvantage: boolean, minCrit: number = 20, elvenAccuracy: boolean = false): number => {
   const success = (21 - minCrit) / 20;
   const failure = 1.0 - success;
   return elvenAccuracy ? 1.0 - failure**3 :
@@ -85,7 +85,7 @@ export const calculateToCrit = (advantage: boolean, disadvantage: boolean, minCr
  * @param {boolean} elvenAccuracy - Whether elven accuracy is applied.
  * @returns {number} The calculated hit chance.
  */
-export const calculateToHit = (toHit, extraAttackToHit, extraTurnToHit, expectedAc, advantage, disadvantage, minCrit = 20, elvenAccuracy = false) => {
+export const calculateToHit = (toHit: number, extraAttackToHit: number, extraTurnToHit: number, expectedAc: number, advantage: boolean, disadvantage: boolean, minCrit: number = 20, elvenAccuracy: boolean = false): number => {
   const successChance = 0.05 + (20 - expectedAc + toHit + extraAttackToHit + extraTurnToHit) / 20;
   const failureChance = 1.0 - successChance;
   const critChance    = calculateToCrit(advantage, disadvantage, minCrit, elvenAccuracy);
@@ -119,23 +119,22 @@ export const calculateToHit = (toHit, extraAttackToHit, extraTurnToHit, expected
  * @param {boolean} [advantage=false] - Optional. If true, advantage is considered in the calculation.
  * @param {boolean} [disadvantage=false] - Optional. If true, disadvantage is considered in the calculation.
  * @param {number} minCrit - The minimum roll on a D20 to score a critical.
- * @returns {type} The given damage as described by the parameters
+ * @returns {number} The given damage as described by the parameters
  */
-// eslint-disable-next-line camelcase
-export const calculate_dpr = (numAttacks: number,
-                              toHit: number,
-                              attackDamage: string,
-                              extraAttackDamage = "",
-                              extraTurnDamage = "",
-                              extraAttackModifier = "",
-                              extraTurnModifier = "",
-                              challengeAc = "0",
-                              minDmg = false,
-                              maxDmg = false,
-                              advantage = false,
-                              disadvantage = false,
-                              minCrit = 20,
-                              elvenAccuracy = false) => {
+export const calculateDpr = (numAttacks: number,
+                             toHit: number,
+                             attackDamage: string,
+                             extraAttackDamage: string = "",
+                             extraTurnDamage: string = "",
+                             extraAttackModifier: string = "",
+                             extraTurnModifier: string = "",
+                             challengeAc: string = "0",
+                             minDmg: boolean = false,
+                             maxDmg: boolean = false,
+                             advantage: boolean = false,
+                             disadvantage: boolean = false,
+                             minCrit: number = 20,
+                             elvenAccuracy = false): number => {
   const critDamage           = parseDamage(attackDamage, true, minDmg, maxDmg);
   const baseDamage           = parseDamage(attackDamage, false, minDmg, maxDmg);
   const perAttackCritBonus   = parseDamage(extraAttackDamage, true, minDmg, maxDmg);
@@ -176,9 +175,9 @@ export const calculateSpellDamage = (spellDc: number,
                                      attackDamage: string,
                                      extraAttackDamage: string,
                                      extraTurnDamage: string,
-                                     noDamageOnSave = false,
-                                     expectedSave = 0,
-                                     numberOfTargets = 1) => {
+                                     noDamageOnSave: boolean = false,
+                                     expectedSave: number = 0,
+                                     numberOfTargets: number = 1): number => {
   // spell damage is:
   // (chance for full damage)*(full damage) + (1 - (chance for full damage))*(half damage)
   const fullChance = (20 - spellDc + expectedSave)/20;
@@ -242,7 +241,10 @@ export const modifySheet = (): void => {
     "🔪 A Deadly Deal DPRs",
     "🗼 Clockwise Tower DPRs",
     "🏫 Breckenridge 3 DPRs"
-  ]
+  ];
   for (const campaign of campaigns)
     groupRowsByColumnValue(campaign, "Character");
 };
+
+// eslint-disable-next-line camelcase
+export const calculate_dpr = calculateDpr;
