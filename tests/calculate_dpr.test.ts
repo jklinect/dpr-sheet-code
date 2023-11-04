@@ -1,9 +1,9 @@
-import { calculate_dpr } from "../Code";
+import { calculate_dpr as calculateDpr } from "../Code";
 import { expect, describe, it } from "@jest/globals";
 
 describe("calculate_dpr", () => {
   it("fist (+0) on skin (AC10)", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d6", // attack damage
@@ -22,7 +22,7 @@ describe("calculate_dpr", () => {
   });
 
   it("fist (+0) on skin (AC10), advantage", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d6", // attack damage
@@ -41,7 +41,7 @@ describe("calculate_dpr", () => {
   });
 
   it("fist (+0) on skin (AC10), disadvantage", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d6", // attack damage
@@ -60,7 +60,7 @@ describe("calculate_dpr", () => {
   });
 
   it("fist (+0) on skin (AC10), elven accuracy", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d6", // attack damage
@@ -81,7 +81,7 @@ describe("calculate_dpr", () => {
   });
 
   it("fist (+0) on skin (AC10), crit on 18+", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d6", // attack damage
@@ -101,7 +101,7 @@ describe("calculate_dpr", () => {
   });
 
   it("fist (+0) on skin (AC10), crit on 18+, advantage", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d6", // attack damage
@@ -121,7 +121,7 @@ describe("calculate_dpr", () => {
   });
 
   it("two swords (+2) on studded leather (AC12)", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       2,     // # attacks
       2,     // to-hit
       "1d6", // attack damage
@@ -140,7 +140,7 @@ describe("calculate_dpr", () => {
   });
 
   it("two swords (+3/+2) on studded leather (AC12)", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       2,     // # attacks
       2,     // to-hit
       "1d6", // attack damage
@@ -159,7 +159,7 @@ describe("calculate_dpr", () => {
   });
 
   it("hand xbow (+0) on skin (AC10), sharpshooter", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d6", // attack damage
@@ -179,7 +179,7 @@ describe("calculate_dpr", () => {
   });
 
   it("3x hand xbow (+0) on skin (AC10), sharpshooter (+10), favored foe (1d4)", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       3,     // # attacks
       0,     // to-hit
       "1d6", // attack damage
@@ -199,7 +199,7 @@ describe("calculate_dpr", () => {
   });
 
   it("max dmg rolls: warhammer (+0) on skin (AC10)", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d10", // attack damage
@@ -218,7 +218,7 @@ describe("calculate_dpr", () => {
   });
 
   it("min dmg rolls: dagger (+0) on skin (AC10)", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       1,     // # attacks
       0,     // to-hit
       "1d4", // attack damage
@@ -238,14 +238,14 @@ describe("calculate_dpr", () => {
 
   it("multiple attacks (1-12)", () => {
     for (let i = 1; i <= 12; i++) {
-      const result = calculate_dpr(i, 0, "1d6", "", "", "", "", "10", false, false, false, false);
+      const result = calculateDpr(i, 0, "1d6", "", "", "", "", "10", false, false, false, false);
       const correct = i * 2.1;
       expect(result).toBeCloseTo(correct);
     }
   });
 
   it("complex: bruce vilanch 12x attack", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       12,     // # attacks
       14,     // to-hit
       "1d6 + 3d6 + 10",
@@ -264,7 +264,7 @@ describe("calculate_dpr", () => {
   });
 
   it("complex: lvl5 sorlock scorching ray/quickened eldritch blast", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       3,     // # attacks
       7,     // to-hit
       "2d6",
@@ -286,7 +286,7 @@ describe("calculate_dpr", () => {
   });
 
   it("complex: DAN's ridiculous 7x crossbow barrage", () => {
-    const result = calculate_dpr(
+    const result = calculateDpr(
       7,     // # attacks
       12,     // to-hit
       "1d6 + 6",

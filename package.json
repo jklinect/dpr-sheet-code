@@ -26,7 +26,7 @@
     "prettier": "prettier src test --write",
     "check": "gts check ./*.ts",
     "clean": "gts clean",
-    "compile": "tsc",
+    "compile": "tsc --build",
     "fix": "gts fix ./*.ts",
     "pretest": "npm run compile && npm run check"
   },
