@@ -2,15 +2,15 @@
  * Parses a damage dice string (1d8 + 4) and returns a floating point representation.
  *
  * @param {string} input - The input value to parse.
- * @param {boolean} critical - Determines if damage dice are doubled or not.
+ * @param {boolean} [critical=false] - Determines if damage dice are doubled or not.
  * @param {boolean} [minOnly=false] - Optional. If true, uses `1` in place of dice rolls.
  * @param {boolean} [maxOnly=false] - Optional. If true, uses the max roll of a dice.
  * @returns {number} The expected value of the damage dice.
  */
-export const parseDamage = (input: string, critical: boolean, minOnly: boolean = false, maxOnly: boolean = false): number => {
+export const parseDamage = (input: string, critical: boolean = false, minOnly: boolean = false, maxOnly: boolean = false): number => {
   let match: RegExpExecArray;
   let roll = 0;
-  if (String(input).indexOf("==") > -1) {
+  if (input.indexOf("==") > -1) {
     const formula = input.split("==");
     input = formula[formula.length - 1];
   }
@@ -50,13 +50,13 @@ export const parseDamage = (input: string, critical: boolean, minOnly: boolean =
 /**
  * Returns the critical hit chance, based on advantage and disadvantage.
  *
- * @param {boolean} advantage - Indicates if the roll is advantaged.
- * @param {boolean} disadvantage - Indicates if the roll is disadvantaged.
- * @param {number} minCrit - The minimum roll on a D20 to score a critical.
- * @param {boolean} elvenAccuracy - Whether elven accuracy is applied.
+ * @param {boolean} [advantage=false] - Indicates if the roll is advantaged.
+ * @param {boolean} [disadvantage=false] - Indicates if the roll is disadvantaged.
+ * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
+ * @param {boolean} [elvenAccuracy=false] - Whether elven accuracy is applied.
  * @returns {number} The critical hit chance
  */
-export const calculateToCrit = (advantage: boolean, disadvantage: boolean, minCrit: number = 20, elvenAccuracy: boolean = false): number => {
+export const calculateToCrit = (advantage: boolean = false, disadvantage: boolean = false, minCrit: number = 20, elvenAccuracy: boolean = false): number => {
   const success = (21 - minCrit) / 20;
   const failure = 1.0 - success;
   return elvenAccuracy ? 1.0 - failure**3 :
@@ -76,17 +76,15 @@ export const calculateToCrit = (advantage: boolean, disadvantage: boolean, minCr
  *
  * This would return 0.50 accordingly.
  * @param {number} toHit - The base to-hit modifier.
- * @param {number} extraAttackToHit - The additional to-hit modifier for each extra attack.
- * @param {number} extraTurnToHit - The additional to-hit modifier applied once a turn.
  * @param {number} expectedAc - The expected armor class of the target.
- * @param {boolean} advantage - Whether advantage is applied.
- * @param {boolean} disadvantage - Whether disadvantage is applied.
- * @param {number} minCrit - The minimum roll on a D20 to score a critical.
- * @param {boolean} elvenAccuracy - Whether elven accuracy is applied.
+ * @param {boolean} [advantage=false] - Whether advantage is applied.
+ * @param {boolean} [disadvantage=false] - Whether disadvantage is applied.
+ * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
+ * @param {boolean} [elvenAccuracy=false] - Whether elven accuracy is applied.
  * @returns {number} The calculated hit chance.
  */
-export const calculateToHit = (toHit: number, extraAttackToHit: number, extraTurnToHit: number, expectedAc: number, advantage: boolean, disadvantage: boolean, minCrit: number = 20, elvenAccuracy: boolean = false): number => {
-  const successChance = 0.05 + (20 - expectedAc + toHit + extraAttackToHit + extraTurnToHit) / 20;
+export const calculateToHit = (toHit: number, expectedAc: number, advantage: boolean = false, disadvantage: boolean = false, minCrit: number = 20, elvenAccuracy: boolean = false): number => {
+  const successChance = 0.05 + (20 - expectedAc + toHit) / 20;
   const failureChance = 1.0 - successChance;
   const critChance    = calculateToCrit(advantage, disadvantage, minCrit, elvenAccuracy);
   if (elvenAccuracy) {
@@ -118,7 +116,8 @@ export const calculateToHit = (toHit: number, extraAttackToHit: number, extraTur
  * @param {boolean} [maxDmg=false] - Optional. If true, only maximum rolls are used in dice roll calculations.
  * @param {boolean} [advantage=false] - Optional. If true, advantage is considered in the calculation.
  * @param {boolean} [disadvantage=false] - Optional. If true, disadvantage is considered in the calculation.
- * @param {number} minCrit - The minimum roll on a D20 to score a critical.
+ * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
+ * @param {boolean} [elvenAccuracy=false] - Optional. If true, elven accuracy is applied.
  * @returns {number} The given damage as described by the parameters
  */
 // eslint-disable-next-line camelcase
@@ -148,12 +147,12 @@ export const calculate_dpr = (numAttacks: number,
   const expectedAc = parseInt(challengeAc);
   // dpr = (crit damage * crit chance) + (normal damage * normal chance)
   const toCritChance = calculateToCrit(advantage, disadvantage, minCrit, elvenAccuracy);
-  let toHitChance: number = calculateToHit(toHit, extraAttackToHit, extraTurnToHit, expectedAc, advantage, disadvantage, minCrit, elvenAccuracy);
+  let toHitChance: number = calculateToHit(toHit + extraAttackToHit + extraTurnToHit, expectedAc, advantage, disadvantage, minCrit, elvenAccuracy);
   dpr = (critDamage + perAttackCritBonus + perTurnCritBonus) * toCritChance +
         (baseDamage + perAttackBonus + perTurnBonus) * Math.min(toHitChance, 0.90);
   // subsequent attacks (no extra_turn_tohit applied)
   if (--numAttacks > 0) {
-    toHitChance = calculateToHit(toHit, extraAttackToHit, 0, expectedAc, advantage, disadvantage, minCrit, elvenAccuracy);
+    toHitChance = calculateToHit(toHit + extraAttackToHit, expectedAc, advantage, disadvantage, minCrit, elvenAccuracy);
     dpr += numAttacks * ((critDamage + perAttackCritBonus) * toCritChance +
                          (baseDamage + perAttackBonus)     * Math.min(toHitChance, 0.90));
   }
@@ -165,17 +164,17 @@ export const calculate_dpr = (numAttacks: number,
  *
  * @param {number} spellDc - The spell's check DC.
  * @param {string} attackDamage - The base damage of the attack.
- * @param {string} extraAttackDamage - The additional damage applied once per hit.
- * @param {string} extraTurnDamage - The additional damage applied once a turn.
- * @param {boolean} noDamageOnSave - If true, a save results in no damage.
- * @param {number} expectedSave - The expected save roll modifier.
- * @param {number} numberOfTargets - The number of targets affected.
+ * @param {string} [extraAttackDamage=""] - The additional damage applied once per hit.
+ * @param {string} [extraTurnDamage=""] - The additional damage applied once a turn.
+ * @param {boolean} [noDamageOnSave=false] - If true, a save results in no damage.
+ * @param {number} [expectedSave=0] - The expected save roll modifier.
+ * @param {number} [numberOfTargets=1] - The number of targets affected.
  * @returns {number} The calculated spell damage.
  */
 export const calculateSpellDamage = (spellDc: number,
                                      attackDamage: string,
-                                     extraAttackDamage: string,
-                                     extraTurnDamage: string,
+                                     extraAttackDamage: string = "",
+                                     extraTurnDamage: string = "",
                                      noDamageOnSave: boolean = false,
                                      expectedSave: number = 0,
                                      numberOfTargets: number = 1): number => {
