@@ -5,6 +5,7 @@
  * @param {boolean} [critical=false] - Determines if damage dice are doubled or not.
  * @param {boolean} [minOnly=false] - Optional. If true, uses `1` in place of dice rolls.
  * @param {boolean} [maxOnly=false] - Optional. If true, uses the max roll of a dice.
+ * @param {boolean} [savageCriticals=false] - Optional. If true, adds an extra damage die to criticals.
  * @returns {number} The expected value of the damage dice.
  */
 export const parseDamage = (
@@ -136,6 +137,7 @@ export const calculateToHit = (
  * @param {boolean} [disadvantage=false] - Optional. If true, disadvantage is considered in the calculation.
  * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
  * @param {boolean} [elvenAccuracy=false] - Optional. If true, elven accuracy is applied.
+ * @param {boolean} [savageCriticals=false] - Optional. If true, adds an extra damage die to criticals.
  * @returns {number} The given damage as described by the parameters
  */
 // eslint-disable-next-line camelcase
