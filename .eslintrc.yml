@@ -3,17 +3,19 @@ env:
   es2021: true
   node: true
 parser: '@typescript-eslint/parser'
-extends: "eslint:recommended"
+extends:
+  - "eslint:recommended"
+  - './node_modules/gts'
 parserOptions:
   ecmaVersion: latest
 plugins:
   - '@typescript-eslint'
 rules:
-  brace-style: ["error", "stroustrup"]
+  # brace-style: ["error", "stroustrup"]
   camelcase: ["error"]
   no-tabs: ["error"]
   no-var: ["error"]
   prefer-const: ["error"]
   prefer-numeric-literals: ["error"]
-  quotes: ["error", "double"]
+  quotes: ["warn", "double"]
   eol-last: ["error"]

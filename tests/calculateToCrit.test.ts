@@ -1,5 +1,4 @@
 import { calculateToCrit } from "../Code";
-import { expect, describe, it } from "@jest/globals";
 
 describe("calculate_to_crit", () => {
   it("should return 5% for normal calls", () => {

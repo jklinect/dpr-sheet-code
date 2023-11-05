@@ -7,7 +7,12 @@
  * @param {boolean} [maxOnly=false] - Optional. If true, uses the max roll of a dice.
  * @returns {number} The expected value of the damage dice.
  */
-export const parseDamage = (input: string, critical: boolean = false, minOnly: boolean = false, maxOnly: boolean = false): number => {
+export const parseDamage = (
+  input: string,
+  critical: boolean = false,
+  minOnly: boolean = false,
+  maxOnly: boolean = false
+): number => {
   let match: RegExpExecArray;
   let roll = 0;
   if (input.indexOf("==") > -1) {
@@ -21,26 +26,21 @@ export const parseDamage = (input: string, critical: boolean = false, minOnly: b
     let value = 0;
     if (match[3]) {
       const sides = parseInt(match[3]);
-      const damage = (minOnly ? 1 : maxOnly ? sides : (sides + 1) / 2);
+      const damage = minOnly ? 1 : maxOnly ? sides : (sides + 1) / 2;
       value = (critical ? 2 * count : count) * damage;
-    }
-    else {
+    } else {
       value = count;
     }
     const impliedAddition = !operator || operator === " ";
     if ((impliedAddition && match[3]) || operator === "+") {
       roll += value;
-    }
-    else if (operator === "-") {
+    } else if (operator === "-") {
       roll -= value;
-    }
-    else if (operator === "*") {
+    } else if (operator === "*") {
       roll *= value;
-    }
-    else if (operator === "/") {
+    } else if (operator === "/") {
       roll /= value;
-    }
-    else if (operator === "^") {
+    } else if (operator === "^") {
       roll **= value;
     }
   }
@@ -56,13 +56,21 @@ export const parseDamage = (input: string, critical: boolean = false, minOnly: b
  * @param {boolean} [elvenAccuracy=false] - Whether elven accuracy is applied.
  * @returns {number} The critical hit chance
  */
-export const calculateToCrit = (advantage: boolean = false, disadvantage: boolean = false, minCrit: number = 20, elvenAccuracy: boolean = false): number => {
+export const calculateToCrit = (
+  advantage: boolean = false,
+  disadvantage: boolean = false,
+  minCrit: number = 20,
+  elvenAccuracy: boolean = false
+): number => {
   const success = (21 - minCrit) / 20;
   const failure = 1.0 - success;
-  return elvenAccuracy ? 1.0 - failure**3 :
-         advantage     ? 1.0 - failure**2 :
-         disadvantage  ? success**2 :
-                         success;
+  return elvenAccuracy
+    ? 1.0 - failure ** 3
+    : advantage
+    ? 1.0 - failure ** 2
+    : disadvantage
+    ? success ** 2
+    : success;
 };
 
 /**
@@ -83,20 +91,29 @@ export const calculateToCrit = (advantage: boolean = false, disadvantage: boolea
  * @param {boolean} [elvenAccuracy=false] - Whether elven accuracy is applied.
  * @returns {number} The calculated hit chance.
  */
-export const calculateToHit = (toHit: number, expectedAc: number, advantage: boolean = false, disadvantage: boolean = false, minCrit: number = 20, elvenAccuracy: boolean = false): number => {
+export const calculateToHit = (
+  toHit: number,
+  expectedAc: number,
+  advantage: boolean = false,
+  disadvantage: boolean = false,
+  minCrit: number = 20,
+  elvenAccuracy: boolean = false
+): number => {
   const successChance = 0.05 + (20 - expectedAc + toHit) / 20;
   const failureChance = 1.0 - successChance;
-  const critChance    = calculateToCrit(advantage, disadvantage, minCrit, elvenAccuracy);
+  const critChance = calculateToCrit(
+    advantage,
+    disadvantage,
+    minCrit,
+    elvenAccuracy
+  );
   if (elvenAccuracy) {
-    return 1 - (failureChance ** 3) - critChance;
-  }
-  else if (advantage) {
-    return 1 - (failureChance ** 2) - critChance;
-  }
-  else if (disadvantage) {
-    return successChance**2 - critChance;
-  }
-  else {
+    return 1 - failureChance ** 3 - critChance;
+  } else if (advantage) {
+    return 1 - failureChance ** 2 - critChance;
+  } else if (disadvantage) {
+    return successChance ** 2 - critChance;
+  } else {
     return successChance - critChance;
   }
 };
@@ -121,40 +138,74 @@ export const calculateToHit = (toHit: number, expectedAc: number, advantage: boo
  * @returns {number} The given damage as described by the parameters
  */
 // eslint-disable-next-line camelcase
-export const calculate_dpr = (numAttacks: number,
-                              toHit: number,
-                              attackDamage: string,
-                              extraAttackDamage: string = "",
-                              extraTurnDamage: string = "",
-                              extraAttackModifier: string = "",
-                              extraTurnModifier: string = "",
-                              challengeAc: string = "0",
-                              minDmg: boolean = false,
-                              maxDmg: boolean = false,
-                              advantage: boolean = false,
-                              disadvantage: boolean = false,
-                              minCrit: number = 20,
-                              elvenAccuracy = false): number => {
-  const critDamage           = parseDamage(attackDamage, true, minDmg, maxDmg);
-  const baseDamage           = parseDamage(attackDamage, false, minDmg, maxDmg);
-  const perAttackCritBonus   = parseDamage(extraAttackDamage, true, minDmg, maxDmg);
-  const perAttackBonus       = parseDamage(extraAttackDamage, false, minDmg, maxDmg);
-  const perTurnCritBonus     = parseDamage(extraTurnDamage, true, minDmg, maxDmg);
-  const perTurnBonus         = parseDamage(extraTurnDamage, false, minDmg, maxDmg);
-  const extraAttackToHit     = parseDamage(extraAttackModifier, false, minDmg, maxDmg);
-  const extraTurnToHit       = parseDamage(extraTurnModifier, false, minDmg, maxDmg);
+export const calculate_dpr = (
+  numAttacks: number,
+  toHit: number,
+  attackDamage: string,
+  extraAttackDamage: string = "",
+  extraTurnDamage: string = "",
+  extraAttackModifier: string = "",
+  extraTurnModifier: string = "",
+  challengeAc: string = "0",
+  minDmg: boolean = false,
+  maxDmg: boolean = false,
+  advantage: boolean = false,
+  disadvantage: boolean = false,
+  minCrit: number = 20,
+  elvenAccuracy = false
+): number => {
+  const critDamage = parseDamage(attackDamage, true, minDmg, maxDmg);
+  const baseDamage = parseDamage(attackDamage, false, minDmg, maxDmg);
+  const perAttackCritBonus = parseDamage(
+    extraAttackDamage,
+    true,
+    minDmg,
+    maxDmg
+  );
+  const perAttackBonus = parseDamage(extraAttackDamage, false, minDmg, maxDmg);
+  const perTurnCritBonus = parseDamage(extraTurnDamage, true, minDmg, maxDmg);
+  const perTurnBonus = parseDamage(extraTurnDamage, false, minDmg, maxDmg);
+  const extraAttackToHit = parseDamage(
+    extraAttackModifier,
+    false,
+    minDmg,
+    maxDmg
+  );
+  const extraTurnToHit = parseDamage(extraTurnModifier, false, minDmg, maxDmg);
   let dpr = 0.0;
   const expectedAc = parseInt(challengeAc);
   // dpr = (crit damage * crit chance) + (normal damage * normal chance)
-  const toCritChance = calculateToCrit(advantage, disadvantage, minCrit, elvenAccuracy);
-  let toHitChance: number = calculateToHit(toHit + extraAttackToHit + extraTurnToHit, expectedAc, advantage, disadvantage, minCrit, elvenAccuracy);
-  dpr = (critDamage + perAttackCritBonus + perTurnCritBonus) * toCritChance +
-        (baseDamage + perAttackBonus + perTurnBonus) * Math.min(toHitChance, 0.90);
+  const toCritChance = calculateToCrit(
+    advantage,
+    disadvantage,
+    minCrit,
+    elvenAccuracy
+  );
+  let toHitChance: number = calculateToHit(
+    toHit + extraAttackToHit + extraTurnToHit,
+    expectedAc,
+    advantage,
+    disadvantage,
+    minCrit,
+    elvenAccuracy
+  );
+  dpr =
+    (critDamage + perAttackCritBonus + perTurnCritBonus) * toCritChance +
+    (baseDamage + perAttackBonus + perTurnBonus) * Math.min(toHitChance, 0.9);
   // subsequent attacks (no extra_turn_tohit applied)
   if (--numAttacks > 0) {
-    toHitChance = calculateToHit(toHit + extraAttackToHit, expectedAc, advantage, disadvantage, minCrit, elvenAccuracy);
-    dpr += numAttacks * ((critDamage + perAttackCritBonus) * toCritChance +
-                         (baseDamage + perAttackBonus)     * Math.min(toHitChance, 0.90));
+    toHitChance = calculateToHit(
+      toHit + extraAttackToHit,
+      expectedAc,
+      advantage,
+      disadvantage,
+      minCrit,
+      elvenAccuracy
+    );
+    dpr +=
+      numAttacks *
+      ((critDamage + perAttackCritBonus) * toCritChance +
+        (baseDamage + perAttackBonus) * Math.min(toHitChance, 0.9));
   }
   return dpr;
 };
@@ -171,21 +222,25 @@ export const calculate_dpr = (numAttacks: number,
  * @param {number} [numberOfTargets=1] - The number of targets affected.
  * @returns {number} The calculated spell damage.
  */
-export const calculateSpellDamage = (spellDc: number,
-                                     attackDamage: string,
-                                     extraAttackDamage: string = "",
-                                     extraTurnDamage: string = "",
-                                     noDamageOnSave: boolean = false,
-                                     expectedSave: number = 0,
-                                     numberOfTargets: number = 1): number => {
+export const calculateSpellDamage = (
+  spellDc: number,
+  attackDamage: string,
+  extraAttackDamage: string = "",
+  extraTurnDamage: string = "",
+  noDamageOnSave: boolean = false,
+  expectedSave: number = 0,
+  numberOfTargets: number = 1
+): number => {
   // spell damage is:
   // (chance for full damage)*(full damage) + (1 - (chance for full damage))*(half damage)
-  const fullChance = (20 - spellDc + expectedSave)/20;
+  const fullChance = (20 - spellDc + expectedSave) / 20;
   const fullDamage = parseDamage(attackDamage, false);
   const halfChance = noDamageOnSave ? 0.0 : 1 - fullChance;
   const extraDamage = parseDamage(extraAttackDamage, false);
   const extraOnetimeDamage = parseDamage(extraTurnDamage, false);
-  const dpr = (fullChance + halfChance * 0.5) * (fullDamage + extraDamage + extraOnetimeDamage);
+  const dpr =
+    (fullChance + halfChance * 0.5) *
+    (fullDamage + extraDamage + extraOnetimeDamage);
   // either all-or-nothing (full only), or 100% chance (full and half)
   return dpr * numberOfTargets;
 };
@@ -197,12 +252,15 @@ export const calculateSpellDamage = (spellDc: number,
  * @param {string} specialColumn - The column to group rows by.
  * @returns {void}
  */
-export const groupRowsByColumnValue = (tabName: string, specialColumn: string): void => {
+export const groupRowsByColumnValue = (
+  tabName: string,
+  specialColumn: string
+): void => {
   // eslint-disable-next-line no-undef
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(tabName);
-  
+
   const lr = sheet.getDataRange().getLastRow();
-  
+
   for (let row = 1; row < lr; row++) {
     const depth = sheet.getRowGroupDepth(row);
     if (depth < 1) continue;
@@ -213,17 +271,16 @@ export const groupRowsByColumnValue = (tabName: string, specialColumn: string): 
   const values = dataRange.getValues();
   const columnToGroup = dataRange.getValues()[0].indexOf(specialColumn) + 1;
   const numRows = values.length;
-  
+
   // Create an object to store the grouped row ranges
   const groupedRows = {};
-  
+
   // Iterate through each row and group them by the column value
   for (let i = 1; i < numRows; i++) {
-    const cellValue = values[i][columnToGroup - 1] + "-" + values[i][columnToGroup];
-    
-    if (!groupedRows[cellValue]) {
-      groupedRows[cellValue] = 1;
-    }
+    const cellValue =
+      values[i][columnToGroup - 1] + "-" + values[i][columnToGroup];
+
+    if (!groupedRows[cellValue]) groupedRows[cellValue] = 1;
     else {
       const newRange = sheet.getRange(i + 1, 1);
       newRange.shiftRowGroupDepth(1);
@@ -240,7 +297,7 @@ export const modifySheet = (): void => {
   const campaigns: string[] = [
     "🔪 A Deadly Deal DPRs",
     "🗼 Clockwise Tower DPRs",
-    "🏫 Breckenridge 3 DPRs"
+    "🏫 Breckenridge 3 DPRs",
   ];
   for (const campaign of campaigns)
     groupRowsByColumnValue(campaign, "Character");

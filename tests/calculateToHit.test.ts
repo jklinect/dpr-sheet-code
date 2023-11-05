@@ -1,36 +1,35 @@
 import { calculateToHit } from "../Code";
-import { expect, describe, it } from "@jest/globals";
 
 describe("calculate_to_hit", () => {
   it("should return 50% for a flat DC10", () => {
     const result = calculateToHit(0, 10, false, false);
-    const correct = 0.50;
+    const correct = 0.5;
     expect(result).toBe(correct);
   });
 
   it("should return 60% for +5 on AC13", () => {
     const result = calculateToHit(5, 13, false, false);
-    const correct = 0.60;
+    const correct = 0.6;
     expect(result).toBe(correct);
   });
 
   it("should correctly apply bonus parameters", () => {
     const attack = calculateToHit(2, 10, false, false);
-    const turn   = calculateToHit(2, 10, false, false);
-    const correct = 0.60;
+    const turn = calculateToHit(2, 10, false, false);
+    const correct = 0.6;
     expect(attack).toBe(correct);
     expect(turn).toBe(correct);
   });
 
   it("should handle advantage correctly", () => {
     const result = calculateToHit(0, 10, true, false);
-    const correct = 0.70;
+    const correct = 0.7;
     expect(result).toBeCloseTo(correct, 10);
   });
-  
+
   it("should handle disadvantage correctly", () => {
     const result = calculateToHit(0, 10, false, true);
-    const correct = 0.30; // 1 - 0.6975 - 0.0025
+    const correct = 0.3; // 1 - 0.6975 - 0.0025
     expect(result).toBeCloseTo(correct, 4);
   });
 
@@ -45,7 +44,7 @@ describe("calculate_to_hit", () => {
     let correct = 0.45;
     expect(result).toBeCloseTo(correct);
     result = calculateToHit(0, 10, false, false, 18);
-    correct = 0.40;
+    correct = 0.4;
     expect(result).toBe(correct);
   });
 
@@ -63,7 +62,7 @@ describe("calculate_to_hit", () => {
 
   it("should handle critical ranges with elven accuracy", () => {
     const result = calculateToHit(0, 10, false, false, 18, true);
-    const correct = 1 - 0.45**3 - (1-0.85**3);
+    const correct = 1 - 0.45 ** 3 - (1 - 0.85 ** 3);
     expect(result).toBeCloseTo(correct);
   });
 });
