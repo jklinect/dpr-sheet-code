@@ -11,7 +11,6 @@ parserOptions:
 plugins:
   - '@typescript-eslint'
 rules:
-  # brace-style: ["error", "stroustrup"]
   camelcase: ["error"]
   no-tabs: ["error"]
   no-var: ["error"]
