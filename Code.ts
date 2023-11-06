@@ -204,10 +204,15 @@ export const calculate_dpr = (
     minCrit,
     elvenAccuracy
   );
+  // 100% = missChance + hitChance + critChance
+  // calculated hit% can't be more than 1-miss%-crit%
+  // amounts to 90% on normal crit chance
+  const maxToHitChance = 1.0 - 0.05 - toCritChance;
   dpr =
     (critDamage + perAttackCritBonus + perTurnCritBonus) * toCritChance +
-    (baseDamage + perAttackBonus + perTurnBonus) * Math.min(toHitChance, 0.9);
-  // subsequent attacks (no extra_turn_tohit applied)
+    (baseDamage + perAttackBonus + perTurnBonus) *
+      Math.min(toHitChance, maxToHitChance);
+  // subsequent attacks (no extraTurnToHit applied)
   if (--numAttacks > 0) {
     toHitChance = calculateToHit(
       toHit + extraAttackToHit,
@@ -220,7 +225,7 @@ export const calculate_dpr = (
     dpr +=
       numAttacks *
       ((critDamage + perAttackCritBonus) * toCritChance +
-        (baseDamage + perAttackBonus) * Math.min(toHitChance, 0.9));
+        (baseDamage + perAttackBonus) * Math.min(toHitChance, maxToHitChance));
   }
   return dpr;
 };
