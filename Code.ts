@@ -218,8 +218,8 @@ export const calculate_dpr = (
     minDmg,
     maxDmg,
     savageCriticals,
-    rerolledDamageDieCount,
-    rerolledDamageDieValue
+    0,
+    undefined
   );
   const perAttackBonus = parseDamage(
     extraAttackDamage,
@@ -227,8 +227,8 @@ export const calculate_dpr = (
     minDmg,
     maxDmg,
     false,
-    rerolledDamageDieCount,
-    rerolledDamageDieValue
+    0,
+    undefined
   );
   const perTurnCritBonus = parseDamage(
     extraTurnDamage,
@@ -236,8 +236,8 @@ export const calculate_dpr = (
     minDmg,
     maxDmg,
     savageCriticals,
-    rerolledDamageDieCount,
-    rerolledDamageDieValue
+    0,
+    undefined
   );
   const perTurnBonus = parseDamage(
     extraTurnDamage,
@@ -245,8 +245,8 @@ export const calculate_dpr = (
     minDmg,
     maxDmg,
     false,
-    rerolledDamageDieCount,
-    rerolledDamageDieValue
+    0,
+    undefined
   );
   const extraAttackToHit = parseDamage(
     extraAttackModifier,
