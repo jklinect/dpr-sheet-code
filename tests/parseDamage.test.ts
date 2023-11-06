@@ -75,4 +75,11 @@ describe("parseDamage", () => {
     const correct = 16;
     expect(result).toBe(correct);
   });
+
+  it("should handle damage re-rolls properly", () => {
+    const damage = "1d6";
+    const result = parseDamage(damage, false, false, false, false, 1);
+    const correct = 4.25;
+    expect(result).toBe(correct);
+  });
 });

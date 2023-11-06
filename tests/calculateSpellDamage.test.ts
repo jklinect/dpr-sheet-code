@@ -1,6 +1,6 @@
 import { calculateSpellDamage } from "../Code";
 
-describe("calculate_spell_damage", () => {
+describe("calculateSpellDamage", () => {
   it("calculate fireball correctly", () => {
     const result = calculateSpellDamage(15, "8d6", "", "", false, 7, 1);
     const correct = 22.4; // (0.40 * (8*3.5)/2) + (0.60 * (8*3.5))

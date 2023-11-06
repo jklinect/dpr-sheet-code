@@ -1,6 +1,6 @@
 import { calculateToCrit } from "../Code";
 
-describe("calculate_to_crit", () => {
+describe("calculateToCrit", () => {
   it("should return 5% for normal calls", () => {
     const result = calculateToCrit(false, false);
     const correct = 0.05;

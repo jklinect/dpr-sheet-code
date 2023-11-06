@@ -1,6 +1,6 @@
 import { calculateToHit } from "../Code";
 
-describe("calculate_to_hit", () => {
+describe("calculateToHit", () => {
   it("should return 50% for a flat DC10", () => {
     const result = calculateToHit(0, 10, false, false);
     const correct = 0.5;
