@@ -1,6 +1,6 @@
 import { calculate_dpr as calculateDpr } from "../Code";
 
-describe("calculate_dpr", () => {
+describe("calculateDpr", () => {
   it("fist (+0) on skin (AC10)", () => {
     const result = calculateDpr(
       1, // # attacks
@@ -98,6 +98,55 @@ describe("calculate_dpr", () => {
       true // savage attacker/extra critical damage
     );
     const correct = 3.5 * 0.5 + 10.5 * 0.05;
+    expect(result).toBe(correct);
+  });
+
+  it("fist (+0) on skin (AC10), piercer (1 reroll)", () => {
+    const result = calculateDpr(
+      1, // # attacks
+      0, // to-hit
+      "1d6 piercing damage", // attack damage
+      "", // extra per-hit damage
+      "", // extra per-turn damage
+      "", // extra to-hit per-hit
+      "", // extra to-hit per-turn
+      "10", // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false, // disadvantage on dice rolls
+      20, // minimum crit
+      false, // elven accuracy
+      true, // savage attacker/extra critical damage
+      1, // # re-rolled dice count
+      3 // highest re-rolled face
+    );
+    const correct = 4.25 * 0.5 + (4.25 + 3.5 + 3.5) * 0.05;
+    expect(result).toBe(correct);
+  });
+
+  it("2d6 (+0) on skin (AC10), great weapon fighter (reroll < 3)", () => {
+    const result = calculateDpr(
+      1, // # attacks
+      0, // to-hit
+      "2d6 hammer fists", // attack damage
+      "", // extra per-hit damage
+      "", // extra per-turn damage
+      "", // extra to-hit per-hit
+      "", // extra to-hit per-turn
+      "10", // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false, // disadvantage on dice rolls
+      20, // minimum crit
+      false, // elven accuracy
+      false, // savage attacker/extra critical damage
+      4, // # re-rolled dice count
+      2 // highest re-rolled face
+    );
+    const ev = 2 * ((1 / 3) * 3.5 + (1 / 6) * (3 + 4 + 5 + 6));
+    const correct = 0.5 * ev + 0.05 * 2 * ev;
     expect(result).toBe(correct);
   });
 

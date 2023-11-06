@@ -1,4 +1,27 @@
 /**
+ * Returns the value of a re-rolled die with `sides` sides.
+ *
+ * @param {number} sides - The number of sides.
+ * @param {boolean} [incremental=false] - Optional. If true, returns the difference between the rerolled and original values.
+ * @param {number} [maxReroll=sides / 2] - Optional. Specifies what the maximum value is that gets re-rolled.
+ * @param {number} [count=1] - Optional. The number of dice to re-roll.
+ * @returns {number} The expected value of the re-rolled die.
+ */
+export const getEvRerolled = (
+  sides: number,
+  incremental: boolean = false,
+  maxReroll: number = sides / 2,
+  count: number = 1
+): number => {
+  const summer = (x: number) => (x > 1 ? x + summer(x - 1) : 1);
+  const expected = (sides + 1) / 2;
+  const rerollChance = maxReroll / sides;
+  const rerolled =
+    rerollChance * expected + (1 / sides) * (summer(sides) - summer(maxReroll));
+  return count * (incremental ? rerolled - expected : rerolled);
+};
+
+/**
  * Parses a damage dice string (1d8 + 4) and returns a floating point representation.
  *
  * @param {string} input - The input value to parse.
@@ -6,6 +29,8 @@
  * @param {boolean} [minOnly=false] - Optional. If true, uses `1` in place of dice rolls.
  * @param {boolean} [maxOnly=false] - Optional. If true, uses the max roll of a dice.
  * @param {boolean} [savageCriticals=false] - Optional. If true, adds an extra damage die to criticals.
+ * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice to re-roll. Include critical damage dice.
+ * @param {number} [rerolledDamageDieCount=undefined] - Optional. The highest value to re-roll damage dice on.
  * @returns {number} The expected value of the damage dice.
  */
 export const parseDamage = (
@@ -13,7 +38,9 @@ export const parseDamage = (
   critical: boolean = false,
   minOnly: boolean = false,
   maxOnly: boolean = false,
-  savageCriticals: boolean = false
+  savageCriticals: boolean = false,
+  rerolledDamageDieCount: number = 0,
+  rerolledDamageDieValue: number = undefined
 ): number => {
   let match: RegExpExecArray;
   let roll = 0;
@@ -27,7 +54,14 @@ export const parseDamage = (
     if (match[3]) {
       const sides = parseInt(match[3]);
       const damage = minOnly ? 1 : maxOnly ? sides : (sides + 1) / 2;
-      value = (critical ? (savageCriticals ? 3 : 2) * count : count) * damage;
+      const diceCount = critical ? (savageCriticals ? 3 : 2) * count : count;
+      value = diceCount * damage;
+      value += getEvRerolled(
+        sides,
+        true,
+        rerolledDamageDieValue || sides / 2,
+        Math.min(diceCount, rerolledDamageDieCount)
+      );
     } else {
       value = count;
     }
@@ -136,6 +170,8 @@ export const calculateToHit = (
  * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
  * @param {boolean} [elvenAccuracy=false] - Optional. If true, elven accuracy is applied.
  * @param {boolean} [savageCriticals=false] - Optional. If true, adds an extra damage die to criticals.
+ * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice to re-roll. Include critical damage dice.
+ * @param {number} [rerolledDamageDieValue=undefined] - Optional. The highest value to re-roll damage dice on.
  * @returns {number} The given damage as described by the parameters
  */
 // eslint-disable-next-line camelcase
@@ -154,32 +190,64 @@ export const calculate_dpr = (
   disadvantage: boolean = false,
   minCrit: number = 20,
   elvenAccuracy: boolean = false,
-  savageCriticals: boolean = false
+  savageCriticals: boolean = false,
+  rerolledDamageDieCount: number = 0,
+  rerolledDamageDieValue: number = undefined
 ): number => {
   const critDamage = parseDamage(
     attackDamage,
     true,
     minDmg,
     maxDmg,
-    savageCriticals
+    savageCriticals,
+    rerolledDamageDieCount,
+    rerolledDamageDieValue
   );
-  const baseDamage = parseDamage(attackDamage, false, minDmg, maxDmg);
+  const baseDamage = parseDamage(
+    attackDamage,
+    false,
+    minDmg,
+    maxDmg,
+    false,
+    rerolledDamageDieCount,
+    rerolledDamageDieValue
+  );
   const perAttackCritBonus = parseDamage(
     extraAttackDamage,
     true,
     minDmg,
     maxDmg,
-    savageCriticals
+    savageCriticals,
+    0,
+    undefined
   );
-  const perAttackBonus = parseDamage(extraAttackDamage, false, minDmg, maxDmg);
+  const perAttackBonus = parseDamage(
+    extraAttackDamage,
+    false,
+    minDmg,
+    maxDmg,
+    false,
+    0,
+    undefined
+  );
   const perTurnCritBonus = parseDamage(
     extraTurnDamage,
     true,
     minDmg,
     maxDmg,
-    savageCriticals
+    savageCriticals,
+    0,
+    undefined
   );
-  const perTurnBonus = parseDamage(extraTurnDamage, false, minDmg, maxDmg);
+  const perTurnBonus = parseDamage(
+    extraTurnDamage,
+    false,
+    minDmg,
+    maxDmg,
+    false,
+    0,
+    undefined
+  );
   const extraAttackToHit = parseDamage(
     extraAttackModifier,
     false,
