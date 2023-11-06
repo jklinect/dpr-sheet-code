@@ -29,7 +29,8 @@ export const parseDamage = (
     if (match[3]) {
       const sides = parseInt(match[3]);
       const damage = minOnly ? 1 : maxOnly ? sides : (sides + 1) / 2;
-      value = (savageCriticals ? 3 : critical ? 2 * count : count) * damage;
+      value =
+        (savageCriticals ? 3 * count : critical ? 2 * count : count) * damage;
     } else {
       value = count;
     }
@@ -155,8 +156,8 @@ export const calculate_dpr = (
   advantage: boolean = false,
   disadvantage: boolean = false,
   minCrit: number = 20,
-  elvenAccuracy = false,
-  savageCriticals = false
+  elvenAccuracy: boolean = false,
+  savageCriticals: boolean = false
 ): number => {
   const critDamage = parseDamage(
     attackDamage,
@@ -165,13 +166,7 @@ export const calculate_dpr = (
     maxDmg,
     savageCriticals
   );
-  const baseDamage = parseDamage(
-    attackDamage,
-    false,
-    minDmg,
-    maxDmg,
-    savageCriticals
-  );
+  const baseDamage = parseDamage(attackDamage, false, minDmg, maxDmg);
   const perAttackCritBonus = parseDamage(
     extraAttackDamage,
     true,
@@ -179,13 +174,7 @@ export const calculate_dpr = (
     maxDmg,
     savageCriticals
   );
-  const perAttackBonus = parseDamage(
-    extraAttackDamage,
-    false,
-    minDmg,
-    maxDmg,
-    savageCriticals
-  );
+  const perAttackBonus = parseDamage(extraAttackDamage, false, minDmg, maxDmg);
   const perTurnCritBonus = parseDamage(
     extraTurnDamage,
     true,
@@ -193,27 +182,14 @@ export const calculate_dpr = (
     maxDmg,
     savageCriticals
   );
-  const perTurnBonus = parseDamage(
-    extraTurnDamage,
-    false,
-    minDmg,
-    maxDmg,
-    savageCriticals
-  );
+  const perTurnBonus = parseDamage(extraTurnDamage, false, minDmg, maxDmg);
   const extraAttackToHit = parseDamage(
     extraAttackModifier,
     false,
     minDmg,
-    maxDmg,
-    savageCriticals
+    maxDmg
   );
-  const extraTurnToHit = parseDamage(
-    extraTurnModifier,
-    false,
-    minDmg,
-    maxDmg,
-    savageCriticals
-  );
+  const extraTurnToHit = parseDamage(extraTurnModifier, false, minDmg, maxDmg);
   let dpr = 0.0;
   const expectedAc = parseInt(challengeAc);
   // dpr = (crit damage * crit chance) + (normal damage * normal chance)
