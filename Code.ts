@@ -17,20 +17,17 @@ export const parseDamage = (
 ): number => {
   let match: RegExpExecArray;
   let roll = 0;
-  if (input.indexOf("==") > -1) {
-    const formula = input.split("==");
-    input = formula[formula.length - 1];
-  }
+  const formula = input.split("==");
+  const { [formula.length - 1]: diceFormula } = formula;
   const diceRegex = /(^|[+-/*^ ])\s*(\d+)d?(\d*)/gm;
-  while ((match = diceRegex.exec(input))) {
+  while ((match = diceRegex.exec(diceFormula))) {
     const operator = match[1];
     const count = parseInt(match[2]);
     let value = 0;
     if (match[3]) {
       const sides = parseInt(match[3]);
       const damage = minOnly ? 1 : maxOnly ? sides : (sides + 1) / 2;
-      value =
-        (savageCriticals ? 3 * count : critical ? 2 * count : count) * damage;
+      value = (critical ? (savageCriticals ? 3 : 2) * count : count) * damage;
     } else {
       value = count;
     }
