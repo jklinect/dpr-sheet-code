@@ -23,10 +23,10 @@
     "lint": "eslint Code.ts tests/*.ts",
     "test": "jest",
     "coverage": "jest --coverage",
-    "prettier": "prettier src test --write",
+    "prettier": "prettier Code.ts tests/*.ts --write",
     "check": "gts check ./*.ts",
     "clean": "gts clean",
-    "compile": "tsc",
+    "compile": "tsc --build",
     "fix": "gts fix ./*.ts",
     "pretest": "npm run compile && npm run check"
   },
