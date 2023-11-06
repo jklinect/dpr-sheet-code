@@ -28,7 +28,7 @@ export const getEvRerolled = (
  * @param {boolean} [critical=false] - Determines if damage dice are doubled or not.
  * @param {boolean} [minOnly=false] - Optional. If true, uses `1` in place of dice rolls.
  * @param {boolean} [maxOnly=false] - Optional. If true, uses the max roll of a dice.
- * @param {boolean} [savageCriticals=false] - Optional. If true, adds an extra damage die to criticals.
+ * @param {number} [extraCriticals=false] - Optional. If true, adds an extra damage die to criticals.
  * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice to re-roll. Include critical damage dice.
  * @param {number} [rerolledDamageDieCount=undefined] - Optional. The highest value to re-roll damage dice on.
  * @returns {number} The expected value of the damage dice.
@@ -38,7 +38,7 @@ export const parseDamage = (
   critical: boolean = false,
   minOnly: boolean = false,
   maxOnly: boolean = false,
-  savageCriticals: boolean = false,
+  extraCriticals: number = 0,
   rerolledDamageDieCount: number = 0,
   rerolledDamageDieValue: number = undefined
 ): number => {
@@ -54,7 +54,7 @@ export const parseDamage = (
     if (match[3]) {
       const sides = parseInt(match[3]);
       const damage = minOnly ? 1 : maxOnly ? sides : (sides + 1) / 2;
-      const diceCount = critical ? (savageCriticals ? 3 : 2) * count : count;
+      const diceCount = critical ? (extraCriticals + 2) * count : count;
       value = diceCount * damage;
       value += getEvRerolled(
         sides,
@@ -169,7 +169,7 @@ export const calculateToHit = (
  * @param {boolean} [disadvantage=false] - Optional. If true, disadvantage is considered in the calculation.
  * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
  * @param {boolean} [elvenAccuracy=false] - Optional. If true, elven accuracy is applied.
- * @param {boolean} [savageCriticals=false] - Optional. If true, adds an extra damage die to criticals.
+ * @param {number} [extraCriticals=false] - Optional. If true, adds an extra damage die to criticals.
  * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice to re-roll. Include critical damage dice.
  * @param {number} [rerolledDamageDieValue=undefined] - Optional. The highest value to re-roll damage dice on.
  * @returns {number} The given damage as described by the parameters
@@ -190,7 +190,7 @@ export const calculate_dpr = (
   disadvantage: boolean = false,
   minCrit: number = 20,
   elvenAccuracy: boolean = false,
-  savageCriticals: boolean = false,
+  extraCriticals: number = 0,
   rerolledDamageDieCount: number = 0,
   rerolledDamageDieValue: number = undefined
 ): number => {
@@ -199,7 +199,7 @@ export const calculate_dpr = (
     true,
     minDmg,
     maxDmg,
-    savageCriticals,
+    extraCriticals,
     rerolledDamageDieCount,
     rerolledDamageDieValue
   );
@@ -208,7 +208,7 @@ export const calculate_dpr = (
     false,
     minDmg,
     maxDmg,
-    false,
+    0,
     rerolledDamageDieCount,
     rerolledDamageDieValue
   );
@@ -217,7 +217,7 @@ export const calculate_dpr = (
     true,
     minDmg,
     maxDmg,
-    savageCriticals,
+    extraCriticals,
     0,
     undefined
   );
@@ -226,7 +226,7 @@ export const calculate_dpr = (
     false,
     minDmg,
     maxDmg,
-    false,
+    0,
     0,
     undefined
   );
@@ -235,7 +235,7 @@ export const calculate_dpr = (
     true,
     minDmg,
     maxDmg,
-    savageCriticals,
+    extraCriticals,
     0,
     undefined
   );
@@ -244,7 +244,7 @@ export const calculate_dpr = (
     false,
     minDmg,
     maxDmg,
-    false,
+    0,
     0,
     undefined
   );

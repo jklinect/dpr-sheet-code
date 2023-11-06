@@ -79,7 +79,7 @@ describe("calculateDpr", () => {
     expect(result).toBeCloseTo(correct, 2);
   });
 
-  it("fist (+0) on skin (AC10), savage attacker", () => {
+  it("fist (+0) on skin (AC10), brutal critical", () => {
     const result = calculateDpr(
       1, // # attacks
       0, // to-hit
@@ -95,7 +95,7 @@ describe("calculateDpr", () => {
       false, // disadvantage on dice rolls
       20, // minimum crit
       false, // elven accuracy
-      true // savage attacker/extra critical damage
+      1 // extra critical dice
     );
     const correct = 3.5 * 0.5 + 10.5 * 0.05;
     expect(result).toBe(correct);
@@ -117,7 +117,7 @@ describe("calculateDpr", () => {
       false, // disadvantage on dice rolls
       20, // minimum crit
       false, // elven accuracy
-      true, // savage attacker/extra critical damage
+      1, // extra critical dice
       1, // # re-rolled dice count
       3 // highest re-rolled face
     );
@@ -141,7 +141,7 @@ describe("calculateDpr", () => {
       false, // disadvantage on dice rolls
       20, // minimum crit
       false, // elven accuracy
-      false, // savage attacker/extra critical damage
+      0, // extra critical dice
       4, // # re-rolled dice count
       2 // highest re-rolled face
     );
