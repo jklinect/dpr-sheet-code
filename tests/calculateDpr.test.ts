@@ -79,6 +79,28 @@ describe("calculate_dpr", () => {
     expect(result).toBeCloseTo(correct, 2);
   });
 
+  it("fist (+0) on skin (AC10), savage attacker", () => {
+    const result = calculateDpr(
+      1, // # attacks
+      0, // to-hit
+      "1d6", // attack damage
+      "", // extra per-hit damage
+      "", // extra per-turn damage
+      "", // extra to-hit per-hit
+      "", // extra to-hit per-turn
+      "10", // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false, // disadvantage on dice rolls
+      20, // minimum crit
+      false, // elven accuracy
+      true // savage attacker/extra critical damage
+    );
+    const correct = 3.5 * 0.5 + 10.5 * 0.05;
+    expect(result).toBe(correct);
+  });
+
   it("fist (+0) on skin (AC10), crit on 18+", () => {
     const result = calculateDpr(
       1, // # attacks
@@ -319,27 +341,5 @@ describe("calculate_dpr", () => {
     );
     const correct = 154.525;
     expect(result).toBeCloseTo(correct);
-  });
-
-  it("fist (+0) on skin (AC10), savage attacker", () => {
-    const result = calculateDpr(
-      1, // # attacks
-      0, // to-hit
-      "1d6", // attack damage
-      "", // extra per-hit damage
-      "", // extra per-turn damage
-      "", // extra to-hit per-hit
-      "", // extra to-hit per-turn
-      "10", // challenge ac
-      false, // min damage on dice rolls
-      false, // max damage on dice rolls
-      false, // advantage on dice rolls
-      false, // disadvantage on dice rolls
-      20, // minimum crit
-      false, // elven accuracy
-      true // savage attacker/extra critical damage
-    );
-    const correct = 3.5 * 0.5 + 10.5 * 0.05;
-    expect(result).toBe(correct);
   });
 });
