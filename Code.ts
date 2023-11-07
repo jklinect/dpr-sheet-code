@@ -2,8 +2,10 @@
  * Returns the value of a re-rolled die with `sides` sides.
  *
  * @param {number} sides - The number of sides.
- * @param {boolean} [incremental=false] - Optional. If true, returns the difference between the rerolled and original values.
- * @param {number} [maxReroll=sides / 2] - Optional. Specifies what the maximum value is that gets re-rolled.
+ * @param {boolean} [incremental=false] - Optional. If true, returns the
+ *     difference between the rerolled and original values.
+ * @param {number} [maxReroll=sides / 2] - Optional. Specifies what the
+ *     maximum value is that gets re-rolled.
  * @param {number} [count=1] - Optional. The number of dice to re-roll.
  * @returns {number} The expected value of the re-rolled die.
  */
@@ -22,15 +24,22 @@ export const getEvRerolled = (
 };
 
 /**
- * Parses a damage dice string (1d8 + 4) and returns a floating point representation.
+ * Parses a damage dice string (1d8 + 4) and returns a floating point
+ *    representation.
  *
  * @param {string} input - The input value to parse.
- * @param {boolean} [critical=false] - Determines if damage dice are doubled or not.
- * @param {boolean} [minOnly=false] - Optional. If true, uses `1` in place of dice rolls.
- * @param {boolean} [maxOnly=false] - Optional. If true, uses the max roll of a dice.
- * @param {number} [extraCriticals=false] - Optional. If true, adds an extra damage die to criticals.
- * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice to re-roll. Include critical damage dice.
- * @param {number} [rerolledDamageDieCount=undefined] - Optional. The highest value to re-roll damage dice on.
+ * @param {boolean} [critical=false] - Determines if damage dice are doubled
+ *     or not.
+ * @param {boolean} [minOnly=false] - Optional. If true, uses `1` in place of
+ *     dice rolls.
+ * @param {boolean} [maxOnly=false] - Optional. If true, uses the max roll of
+ *     a dice.
+ * @param {number} [extraCriticals=false] - Optional. If true, adds an extra
+ *     damage die to criticals.
+ * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice
+ *     to re-roll. Include critical damage dice in this count.
+ * @param {number} [rerolledDamageDieCount=undefined] - Optional. The highest
+ *     value to re-roll damage dice on.
  * @returns {number} The expected value of the damage dice.
  */
 export const parseDamage = (
@@ -85,8 +94,10 @@ export const parseDamage = (
  * Returns the critical hit chance, based on advantage and disadvantage.
  *
  * @param {boolean} [advantage=false] - Indicates if the roll is advantaged.
- * @param {boolean} [disadvantage=false] - Indicates if the roll is disadvantaged.
- * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
+ * @param {boolean} [disadvantage=false] - Indicates if the roll is
+ *     disadvantaged.
+ * @param {number} [minCrit=20] - The minimum roll on a D20 to score a
+ *     critical, if not a 20. Features like Superior Critical lower this.
  * @param {boolean} [elvenAccuracy=false] - Whether elven accuracy is applied.
  * @returns {number} The critical hit chance
  */
@@ -108,9 +119,9 @@ export const calculateToCrit = (
 };
 
 /**
- * This function calculates the hit-once chance based on various parameters. It does
- * not factor in critical success, it returns the chance excluding that.
- * As an example, on a simple DC10 check with no modifier:
+ * This function calculates the hit-once chance based on various parameters.
+ * It does not factor in critical success, it returns the chance excluding
+ * that. As an example, on a simple DC10 check with no modifier:
  * * 1 critical fails (5%)
  * * 2 - 9 fail (45%)
  * * 10 - 19 succeed (50%)
@@ -121,7 +132,8 @@ export const calculateToCrit = (
  * @param {number} expectedAc - The expected armor class of the target.
  * @param {boolean} [advantage=false] - Whether advantage is applied.
  * @param {boolean} [disadvantage=false] - Whether disadvantage is applied.
- * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
+ * @param {number} [minCrit=20] - The minimum roll on a D20 to score a
+ *     critical, if not a 20.
  * @param {boolean} [elvenAccuracy=false] - Whether elven accuracy is applied.
  * @returns {number} The calculated hit chance.
  */
@@ -158,20 +170,34 @@ export const calculateToHit = (
  * @param {number} numAttacks - The number of attacks.
  * @param {number} toHit - The base 'to hit' value.
  * @param {string} attackDamage - The base attack damage.
- * @param {string} [extraAttackDamage=""] - Optional. Extra damage applied on each attack.
- * @param {string} [extraTurnDamage=""] - Optional. Extra damage applied once a turn.
- * @param {string} [extraAttackModifier=""] - Optional. Extra 'to hit' modifier for each attack.
- * @param {string} [extraTurnModifier=""] - Optional. Extra 'to hit' modifier for each turn.
- * @param {string} [challengeAc="0"] - Optional. The challenge rating armor class.
- * @param {boolean} [minDmg=false] - Optional. If true, only 1s are used in dice roll calculations.
- * @param {boolean} [maxDmg=false] - Optional. If true, only maximum rolls are used in dice roll calculations.
- * @param {boolean} [advantage=false] - Optional. If true, advantage is considered in the calculation.
- * @param {boolean} [disadvantage=false] - Optional. If true, disadvantage is considered in the calculation.
- * @param {number} [minCrit=20] - The minimum roll on a D20 to score a critical.
- * @param {boolean} [elvenAccuracy=false] - Optional. If true, elven accuracy is applied.
- * @param {number} [extraCriticals=false] - Optional. If true, adds an extra damage die to criticals.
- * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice to re-roll. Include critical damage dice.
- * @param {number} [rerolledDamageDieValue=undefined] - Optional. The highest value to re-roll damage dice on.
+ * @param {string} [extraAttackDamage=""] - Optional. Extra damage applied on
+ *     each attack.
+ * @param {string} [extraTurnDamage=""] - Optional. Extra damage applied once
+ *     a turn.
+ * @param {string} [extraAttackModifier=""] - Optional. Extra 'to hit'
+ *     modifier for each attack.
+ * @param {string} [extraTurnModifier=""] - Optional. Extra 'to hit'
+ *     modifier for each turn.
+ * @param {string} [challengeAc="0"] - Optional. The challenge rating armor
+ *     class.
+ * @param {boolean} [minDmg=false] - Optional. If true, only 1s are used in
+ *     dice roll calculations.
+ * @param {boolean} [maxDmg=false] - Optional. If true, only maximum rolls are
+ *     used in dice roll calculations.
+ * @param {boolean} [advantage=false] - Optional. If true, advantage is
+ *     considered in the calculation.
+ * @param {boolean} [disadvantage=false] - Optional. If true, disadvantage is
+ *     considered in the calculation.
+ * @param {number} [minCrit=20] - The minimum roll on a D20 to score a
+ *     critical.
+ * @param {boolean} [elvenAccuracy=false] - Optional. If true, elven accuracy
+ *     is applied.
+ * @param {number} [extraCriticals=false] - Optional. If true, adds an extra
+ *     damage die to criticals.
+ * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice
+ *     to re-roll. Include critical damage dice.
+ * @param {number} [rerolledDamageDieValue=undefined] - Optional. The highest
+ *     value to re-roll damage dice on.
  * @returns {number} The given damage as described by the parameters
  */
 // eslint-disable-next-line camelcase
@@ -303,9 +329,12 @@ export const calculate_dpr = (
  *
  * @param {number} spellDc - The spell's check DC.
  * @param {string} attackDamage - The base damage of the attack.
- * @param {string} [extraAttackDamage=""] - The additional damage applied once per hit.
- * @param {string} [extraTurnDamage=""] - The additional damage applied once a turn.
- * @param {boolean} [noDamageOnSave=false] - If true, a save results in no damage.
+ * @param {string} [extraAttackDamage=""] - The additional damage applied once
+ *     per hit.
+ * @param {string} [extraTurnDamage=""] - The additional damage applied once a
+ *     turn.
+ * @param {boolean} [noDamageOnSave=false] - If true, a save results in no
+ *     damage.
  * @param {number} [expectedSave=0] - The expected save roll modifier.
  * @param {number} [numberOfTargets=1] - The number of targets affected.
  * @returns {number} The calculated spell damage.
@@ -320,7 +349,8 @@ export const calculateSpellDamage = (
   numberOfTargets: number = 1
 ): number => {
   // spell damage is:
-  // (chance for full damage)*(full damage) + (1 - (chance for full damage))*(half damage)
+  // (chance for full damage)*(full damage) +
+  //   (1 - (chance for full damage))*(half damage)
   const fullChance = (20 - spellDc + expectedSave) / 20;
   const fullDamage = parseDamage(attackDamage, false);
   const halfChance = noDamageOnSave ? 0.0 : 1 - fullChance;

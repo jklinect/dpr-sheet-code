@@ -17,4 +17,5 @@ rules:
   prefer-const: ["error"]
   prefer-numeric-literals: ["error"]
   quotes: ["warn", "double"]
+  require-jsdoc: ["error"]
   eol-last: ["error"]

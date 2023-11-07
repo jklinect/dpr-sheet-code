@@ -57,7 +57,7 @@ describe("parseDamage", () => {
     }
   });
 
-  it('should correctly handle "==" in the string', () => {
+  it("should correctly handle '==' in the string", () => {
     const damage = `1d6 + 10 sharpshooter
     + 1d4 favored foe
     ==
