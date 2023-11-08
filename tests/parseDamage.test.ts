@@ -1,4 +1,4 @@
-import { parseDamage } from "../Code";
+import { parseDamage } from "../src/Code";
 
 describe("parseDamage", () => {
   const dice = {

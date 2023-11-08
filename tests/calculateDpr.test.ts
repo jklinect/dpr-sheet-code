@@ -1,4 +1,4 @@
-import { calculate_dpr as calculateDpr } from "../Code";
+import { calculate_dpr as calculateDpr } from "../src/Code";
 
 describe("calculateDpr", () => {
   it("fist (+0) on skin (AC10)", () => {

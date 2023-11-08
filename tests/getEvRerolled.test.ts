@@ -1,4 +1,4 @@
-import { getEvRerolled } from "../Code";
+import { getEvRerolled } from "../src/Code";
 
 describe("getEvRerolled", () => {
   const dice = {

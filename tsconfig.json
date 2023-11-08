@@ -8,6 +8,6 @@
         "esModuleInterop": true
     },
     "include": [
-        "./Code.ts"
+        "src/*.ts"
       ],
 }
