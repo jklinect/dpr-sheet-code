@@ -24,10 +24,10 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "prettier": "prettier Code.ts tests/*.ts --write",
-    "check": "gts check ./*.ts",
+    "check": "gts check ./Code.ts",
     "clean": "gts clean",
     "compile": "tsc --build",
-    "fix": "gts fix ./*.ts",
+    "fix": "gts fix ./Code.ts",
     "pretest": "npm run compile && npm run check"
   },
   "nyc": {
@@ -89,6 +89,7 @@
     "server-destroy": "^1.0.1",
     "split-lines": "^3.0.0",
     "strip-bom": "^5.0.0",
+    "ts-node": "^10.9.1",
     "ts2gas": "^4.2.0",
     "typescript": "^4.4.2"
   },
