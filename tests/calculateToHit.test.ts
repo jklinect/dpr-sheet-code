@@ -1,4 +1,4 @@
-import { calculateToHit } from "../Code";
+import { calculateToHit } from "../src/Code";
 
 describe("calculateToHit", () => {
   it("should return 50% for a flat DC10", () => {

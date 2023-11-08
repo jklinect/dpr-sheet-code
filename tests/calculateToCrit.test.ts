@@ -1,4 +1,4 @@
-import { calculateToCrit } from "../Code";
+import { calculateToCrit } from "../src/Code";
 
 describe("calculateToCrit", () => {
   it("should return 5% for normal calls", () => {

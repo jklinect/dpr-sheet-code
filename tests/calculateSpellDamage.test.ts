@@ -1,4 +1,4 @@
-import { calculateSpellDamage } from "../Code";
+import { calculateSpellDamage } from "../src/Code";
 
 describe("calculateSpellDamage", () => {
   it("calculate fireball correctly", () => {

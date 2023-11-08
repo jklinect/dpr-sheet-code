@@ -20,14 +20,14 @@
     "build-fresh": "npm cache clean --force && npm i && npm run build",
     "watch": "tsc --project tsconfig.json --watch",
     "prepare": "npm run compile",
-    "lint": "eslint Code.ts tests/*.ts",
+    "lint": "eslint src/*.ts tests/*.ts",
     "test": "jest",
     "coverage": "jest --coverage",
-    "prettier": "prettier Code.ts tests/*.ts --write",
-    "check": "gts check ./Code.ts",
+    "prettier": "prettier src/*.ts tests/*.ts --write",
+    "check": "gts check src/*.ts",
     "clean": "gts clean",
     "compile": "tsc --build",
-    "fix": "gts fix ./Code.ts",
+    "fix": "gts fix src/*.ts",
     "pretest": "npm run compile && npm run check"
   },
   "nyc": {
