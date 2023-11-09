@@ -5,9 +5,16 @@
         ],
         "experimentalDecorators": true,
         "skipLibCheck": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "noEmit": true
     },
     "include": [
         "src/*.ts"
-      ],
+    ],
+    "exclude": [
+        "node_modules"
+    ],
 }

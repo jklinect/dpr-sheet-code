@@ -12,6 +12,7 @@ plugins:
   - '@typescript-eslint'
 rules:
   camelcase: ["error"]
+  no-constant-binary-expression: ["error"]
   no-tabs: ["error"]
   no-var: ["error"]
   prefer-const: ["error"]
