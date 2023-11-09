@@ -24,7 +24,7 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "prettier": "prettier src/*.ts tests/*.ts --write",
-    "check": "gts check src/*.ts",
+    "check": "gts check src/*.ts tests/*.ts",
     "clean": "gts clean",
     "compile": "tsc --build",
     "fix": "gts fix src/*.ts",
