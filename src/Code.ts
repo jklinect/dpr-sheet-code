@@ -34,8 +34,8 @@ export const getEvRerolled = (
  *     dice rolls.
  * @param {boolean} [maxOnly=false] - Optional. If true, uses the max roll of
  *     a dice.
- * @param {number} [extraCriticals=false] - Optional. If true, adds an extra
- *     damage die to criticals.
+ * @param {number} [extraCriticals=0] - Optional. If > 0, adds that many extra
+ *     damage die to critical hits.
  * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice
  *     to re-roll. Include critical damage dice in this count.
  * @param {number} [rerolledDamageDieCount=undefined] - Optional. The highest
@@ -192,8 +192,8 @@ export const calculateToHit = (
  *     critical.
  * @param {boolean} [elvenAccuracy=false] - Optional. If true, elven accuracy
  *     is applied.
- * @param {number} [extraCriticals=false] - Optional. If true, adds an extra
- *     damage die to criticals.
+ * @param {number} [extraCriticals=0] - Optional. If true, adds that many extra
+ *     damage die to critical hits.
  * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice
  *     to re-roll. Include critical damage dice.
  * @param {number} [rerolledDamageDieValue=undefined] - Optional. The highest

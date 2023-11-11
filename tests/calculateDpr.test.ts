@@ -95,9 +95,9 @@ describe("calculateDpr", () => {
       false, // disadvantage on dice rolls
       20, // minimum crit
       false, // elven accuracy
-      1 // extra critical dice
+      3 // extra critical dice
     );
-    const correct = 3.5 * 0.5 + 10.5 * 0.05;
+    const correct = 3.5 * 0.5 + 3.5 * 5 * 0.05;
     expect(result).toBe(correct);
   });
 
