@@ -7,24 +7,25 @@ The workbook is available [here](https://docs.google.com/spreadsheets/d/1WTOgF6m
 ## Setting up
 
 Set up the node environment:
-```
+```shellsession
 $ npm install
 ```
 
 Set up the `clasp` configuration:
-```
+```shellsession
 $ clasp clone projectID
 ```
 
 ## Running tests
 
-```
-$ npm run test
+```shellsession
+$ npm run test      # runs unit tests
+$ npm run coverage  # displays code coverage results
 ```
 
 ## Pushing changes up
 
-```
+```shellsession
 $ clasp push
 ```
 
