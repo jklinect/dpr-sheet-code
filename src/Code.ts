@@ -145,8 +145,11 @@ export const calculateToHit = (
   minCrit: number = 20,
   elvenAccuracy: boolean = false
 ): number => {
-  // max this can be is a 95%, because a 1 is an auto-fail
-  const successChance = Math.min(0.95, 0.05 + (20 - expectedAc + toHit) / 20);
+  // chance isin [0.05, 0.95]
+  const successChance = Math.min(
+    0.95,
+    Math.max(0.05, (21 - expectedAc + toHit) / 20)
+  );
   const failureChance = 1.0 - successChance;
   const critChance = calculateToCrit(
     advantage,
