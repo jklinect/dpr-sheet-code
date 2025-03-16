@@ -55,7 +55,7 @@ export const parseDamage = (
   let roll = 0;
   const formula = input.split("==");
   const { [formula.length - 1]: diceFormula } = formula;
-  const diceRegex = /(^|[+-/*^ ])\s*(\d+)d?(\d*)/gm;
+  const diceRegex = /(^|[+-/÷*×^ ])\s*(\d+)d?(\d*)/gm;
   while ((match = diceRegex.exec(diceFormula))) {
     const operator = match[1];
     const count = parseInt(match[2]);
@@ -79,9 +79,9 @@ export const parseDamage = (
       roll += value;
     } else if (operator === "-") {
       roll -= value;
-    } else if (operator === "*") {
+    } else if (["*", "×"].includes(operator)) {
       roll *= value;
-    } else if (operator === "/") {
+    } else if (["/", "÷"].includes(operator)) {
       roll /= value;
     } else if (operator === "^") {
       roll **= value;
@@ -132,7 +132,7 @@ export const calculateToCrit = (
  * @param {number} expectedAc - The expected armor class of the target.
  * @param {boolean} [advantage=false] - Whether advantage is applied.
  * @param {boolean} [disadvantage=false] - Whether disadvantage is applied.
- * @param {number} [minCrit=20] - The minimum roll on a D20 to score a
+ * @param {number} [minCrit=20] - The minimum roll on a d20 to score a
  *     critical, if not a 20.
  * @param {boolean} [elvenAccuracy=false] - Whether elven accuracy is applied.
  * @returns {number} The calculated hit chance.
@@ -145,7 +145,11 @@ export const calculateToHit = (
   minCrit: number = 20,
   elvenAccuracy: boolean = false
 ): number => {
-  const successChance = 0.05 + (20 - expectedAc + toHit) / 20;
+  // chance isin [0.05, 0.95]
+  const successChance = Math.min(
+    0.95,
+    Math.max((21 - minCrit) / 20, (21 - expectedAc + toHit) / 20)
+  );
   const failureChance = 1.0 - successChance;
   const critChance = calculateToCrit(
     advantage,
@@ -351,7 +355,7 @@ export const calculateSpellDamage = (
   // spell damage is:
   // (chance for full damage)*(full damage) +
   //   (1 - (chance for full damage))*(half damage)
-  const fullChance = (20 - spellDc + expectedSave) / 20;
+  const fullChance = 1 - Math.max(20 - spellDc + expectedSave, 1) / 20;
   const fullDamage = parseDamage(attackDamage, false);
   const halfChance = noDamageOnSave ? 0.0 : 1 - fullChance;
   const extraDamage = parseDamage(extraAttackDamage, false);
@@ -366,16 +370,18 @@ export const calculateSpellDamage = (
 /**
  * Groups rows in a table by a specific column value.
  *
- * @param {string} tabName - The tab name.
+ * @param {string} tabName - The tab name. If undefined, uses the currently selected tab instead.
  * @param {string} specialColumn - The column to group rows by.
  * @returns {void}
  */
 export const groupRowsByColumnValue = (
-  tabName: string,
+  tabName: string | undefined,
   specialColumn: string
 ): void => {
-  // eslint-disable-next-line no-undef
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(tabName);
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = tabName
+    ? spreadsheet.getSheetByName(tabName)
+    : spreadsheet.getActiveSheet();
 
   const lr = sheet.getDataRange().getLastRow();
 
@@ -412,11 +418,30 @@ export const groupRowsByColumnValue = (
  * @returns {void} No return value.
  */
 export const modifySheet = (): void => {
-  const campaigns: string[] = [
-    "🔪 A Deadly Deal DPRs",
-    "🗼 Clockwise Tower DPRs",
-    "🏫 Breckenridge 3 DPRs",
-  ];
+  const campaigns: string[] = ["🏫 Breckenridge 3 DPRs", "🦹🏼 Dark Elves DPRs"];
   for (const campaign of campaigns)
     groupRowsByColumnValue(campaign, "Character");
+};
+
+/**
+ * This function groups the characters on the current sheet.
+ *
+ * @returns {void} No return value.
+ */
+export const modifyCurrentSheet = (): void => {
+  groupRowsByColumnValue(undefined, "Character");
+};
+
+/**
+ * Method that gets run when the sheet opens. Adds a menu button.
+ *
+ * @returns {void}
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const onOpen = (): void => {
+  const ui = SpreadsheetApp.getUi();
+  ui.createMenu("Run")
+    .addItem("Clean Active Campaigns", "modifySheet")
+    .addItem("Clean Current Sheet", "modifyCurrentSheet")
+    .addToUi();
 };

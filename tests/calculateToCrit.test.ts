@@ -48,13 +48,13 @@ describe("calculateToCrit", () => {
 
   it("should handle elven accuracy with major crit values", () => {
     let result = calculateToCrit(true, false, 20, true);
-    let correct = 0.142625; // 1-0.95**3
+    let correct = 1 - 0.95 ** 3;
     expect(result).toBeCloseTo(correct, 2);
     result = calculateToCrit(true, false, 19, true);
-    correct = 0.271; // 1-0.90**3
+    correct = 1 - 0.9 ** 3;
     expect(result).toBeCloseTo(correct, 2);
     result = calculateToCrit(true, false, 18, true);
-    correct = 0.385875; // 1-0.85**3
+    correct = 1 - 0.85 ** 3;
     expect(result).toBeCloseTo(correct, 2);
   });
 });
