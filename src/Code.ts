@@ -302,14 +302,9 @@ export const calculate_dpr = (
     minCrit,
     elvenAccuracy
   );
-  // 100% = missChance + hitChance + critChance
-  // calculated hit% can't be more than 1-miss%-crit%
-  // amounts to 90% on normal crit chance
-  const maxToHitChance = 1.0 - 0.05 - toCritChance;
   dpr =
     (critDamage + perAttackCritBonus + perTurnCritBonus) * toCritChance +
-    (baseDamage + perAttackBonus + perTurnBonus) *
-      Math.min(toHitChance, maxToHitChance);
+    (baseDamage + perAttackBonus + perTurnBonus) * toHitChance;
   // subsequent attacks (no extraTurnToHit applied)
   if (--numAttacks > 0) {
     toHitChance = calculateToHit(
@@ -323,7 +318,7 @@ export const calculate_dpr = (
     dpr +=
       numAttacks *
       ((critDamage + perAttackCritBonus) * toCritChance +
-        (baseDamage + perAttackBonus) * Math.min(toHitChance, maxToHitChance));
+        (baseDamage + perAttackBonus) * toHitChance);
   }
   return dpr;
 };
@@ -418,7 +413,7 @@ export const groupRowsByColumnValue = (
  * @returns {void} No return value.
  */
 export const modifySheet = (): void => {
-  const campaigns: string[] = ["🏫 Breckenridge 3 DPRs", "🦹🏼 Dark Elves DPRs"];
+  const campaigns: string[] = ["🏫 Breckenridge 3 DPRs", "🛸 Prometheus DPRs"];
   for (const campaign of campaigns)
     groupRowsByColumnValue(campaign, "Character");
 };
