@@ -109,7 +109,7 @@ describe("calculateToHit", () => {
 
   it("should be 90% at 0 AC", () => {
     const result = calculateToHit(25, 0, false, false);
-    const correct = 0.9;
+    const correct = 0.95 - 0.05;
     expect(result).toBeCloseTo(correct);
   });
 });

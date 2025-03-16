@@ -6,27 +6,35 @@ The workbook is available [here](https://docs.google.com/spreadsheets/d/1WTOgF6m
 
 ## Setting up
 
-Set up the node environment:
+Set up [`just`](https://github.com/casey/just) and [clasp](https://github.com/google/clasp):
 ```shellsession
-$ npm install
+$ npm install -g rust-just @google/clasp@2.4.2
+$ clasp login
 ```
 
-Set up the `clasp` configuration:
+Set up the node environment:
 ```shellsession
-$ clasp clone projectID
+$ just install
 ```
+
+Set up the `clasp` configuration in your repo:
+```shellsession
+$ just pull projectID
+```
+
+Edit `rootDir` in `.clasp.json` to be your repo directory.
 
 ## Running tests
 
 ```shellsession
-$ npm run test      # runs unit tests
-$ npm run coverage  # displays code coverage results
+$ just test      # runs unit tests
+$ just coverage  # displays code coverage results
 ```
 
 ## Pushing changes up
 
 ```shellsession
-$ clasp push
+$ just push
 ```
 
 ## Resources
