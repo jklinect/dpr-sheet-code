@@ -148,7 +148,7 @@ export const calculateToHit = (
   // chance isin [0.05, 0.95]
   const successChance = Math.min(
     0.95,
-    Math.max(0.05, (21 - expectedAc + toHit) / 20)
+    Math.max((21 - minCrit) / 20, (21 - expectedAc + toHit) / 20)
   );
   const failureChance = 1.0 - successChance;
   const critChance = calculateToCrit(
