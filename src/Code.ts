@@ -109,11 +109,11 @@ export const calculateToCrit = (
 ): number => {
   const success = (21 - minCrit) / 20;
   const failure = 1.0 - success;
-  return elvenAccuracy
+  return elvenAccuracy && !disadvantage
     ? 1.0 - failure ** 3
-    : advantage
+    : advantage && !disadvantage
     ? 1.0 - failure ** 2
-    : disadvantage
+    : disadvantage && !advantage
     ? success ** 2
     : success;
 };
@@ -157,11 +157,11 @@ export const calculateToHit = (
     minCrit,
     elvenAccuracy
   );
-  if (elvenAccuracy) {
+  if (elvenAccuracy && !disadvantage) {
     return 1 - failureChance ** 3 - critChance;
-  } else if (advantage) {
+  } else if (advantage && !disadvantage) {
     return 1 - failureChance ** 2 - critChance;
-  } else if (disadvantage) {
+  } else if (disadvantage && !advantage) {
     return successChance ** 2 - critChance;
   } else {
     return successChance - critChance;

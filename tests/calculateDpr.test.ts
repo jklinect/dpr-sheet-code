@@ -391,4 +391,23 @@ describe("calculateDpr", () => {
     const correct = 154.525;
     expect(result).toBeCloseTo(correct);
   });
+
+  it("fist (+0) on skin (AC10), advantage and disadvantage cancel out", () => {
+    const result = calculateDpr(
+      1, // # attacks
+      0, // to-hit
+      "1d6", // attack damage
+      "", // extra per-hit damage
+      "", // extra per-turn damage
+      "", // extra to-hit per-hit
+      "", // extra to-hit per-turn
+      "10", // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      true, // advantage on dice rolls
+      true // disadvantage on dice rolls
+    );
+    const correct = 2.1; // Should be same as normal roll
+    expect(result).toBe(correct);
+  });
 });
