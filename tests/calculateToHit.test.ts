@@ -112,4 +112,13 @@ describe("calculateToHit", () => {
     const correct = 0.9;
     expect(result).toBeCloseTo(correct);
   });
+
+  it("should be correctly calculated at 0 AC with multiple die", () => {
+    const advantaged = calculateToHit(25, 0, true, false);
+    expect(advantaged).toBeCloseTo(1 - 0.05 ** 2 - (1 - 0.95 ** 2));
+    const disadvantaged = calculateToHit(25, 0, false, true);
+    expect(disadvantaged).toBeCloseTo(0.95 ** 2 - 1 / 400);
+    const elvenAdvantaged = calculateToHit(25, 0, false, false, 20, true);
+    expect(elvenAdvantaged).toBeCloseTo(1 - 0.05 ** 3 - (1 - 0.95 ** 3));
+  });
 });
