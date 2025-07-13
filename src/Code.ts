@@ -380,7 +380,7 @@ export const groupRowsByColumnValue = (
 
   const lr = sheet.getDataRange().getLastRow();
 
-  for (let row = 1; row < lr; row++) {
+  for (let row = 2; row < lr; row++) {
     const depth = sheet.getRowGroupDepth(row);
     if (depth < 1) continue;
     sheet.getRowGroup(row, depth).remove();
@@ -388,14 +388,14 @@ export const groupRowsByColumnValue = (
 
   const dataRange = sheet.getDataRange();
   const values = dataRange.getValues();
-  const columnToGroup = dataRange.getValues()[0].indexOf(specialColumn) + 1;
+  const columnToGroup = dataRange.getValues()[1].indexOf(specialColumn) + 1;
   const numRows = values.length;
 
   // Create an object to store the grouped row ranges
   const groupedRows = {};
 
   // Iterate through each row and group them by the column value
-  for (let i = 1; i < numRows; i++) {
+  for (let i = 2; i < numRows; i++) {
     const cellValue =
       values[i][columnToGroup - 1] + "-" + values[i][columnToGroup];
 
@@ -413,7 +413,7 @@ export const groupRowsByColumnValue = (
  * @returns {void} No return value.
  */
 export const modifySheet = (): void => {
-  const campaigns: string[] = ["🏫 Breckenridge 3 DPRs", "🛸 Prometheus DPRs"];
+  const campaigns: string[] = ["🧟‍♂️ Immortal Vigil DPRs", "🛸 Prometheus DPRs"];
   for (const campaign of campaigns)
     groupRowsByColumnValue(campaign, "Character");
 };
