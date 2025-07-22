@@ -82,4 +82,11 @@ describe("parseDamage", () => {
     const correct = 4.25;
     expect(result).toBe(correct);
   });
+
+  it("should handle great weapon master feat re-rolls", () => {
+    const damage = "1d6";
+    const result = parseDamage(damage, false, false, false, undefined, 2, 2, 3);
+    const correct = (3 + 3 + 3 + 4 + 5 + 6) / 6;
+    expect(result).toBe(correct);
+  });
 });
