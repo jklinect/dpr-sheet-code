@@ -391,4 +391,57 @@ describe("calculateDpr", () => {
     const correct = 154.525;
     expect(result).toBeCloseTo(correct);
   });
+
+  it("damage on miss: dagger (+0) on skin (AC10)", () => {
+    const missDamage = 6;
+    const result = calculateDpr(
+      1, // # attacks
+      0, // to-hit
+      "1d4", // attack damage
+      "", // extra per-hit damage
+      "", // extra per-turn damage
+      "", // extra to-hit per-hit
+      "", // extra to-hit per-turn
+      "10", // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false, // disadvantage on dice rolls
+      20, // crit range
+      false, // elven advantage
+      0, // extra criticals
+      0, // # of damage die to reroll
+      0, // # on face to reroll,
+      0, // # to use in re-roll (doesnt matter here)
+      missDamage // damage on miss
+    );
+    const correct = 0.05 * 5 + 0.5 * 2.5 + (1 - 0.55) * missDamage;
+    expect(result).toBeCloseTo(correct, 4);
+  });
+
+  it("gwm damage re-roll: {1, 2} -> {3, 3}", () => {
+    const result = calculateDpr(
+      1, // # attacks
+      0, // to-hit
+      "1d4", // attack damage
+      "", // extra per-hit damage
+      "", // extra per-turn damage
+      "", // extra to-hit per-hit
+      "", // extra to-hit per-turn
+      "10", // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false, // disadvantage on dice rolls
+      20, // crit range
+      false, // elven advantage
+      0, // extra criticals
+      2, // # of damage die to reroll
+      2, // # on face to reroll,
+      3 // # to use in re-roll (doesnt matter here)
+    );
+    const ev = (3 + 3 + 3 + 4) / 4;
+    const correct = 0.05 * 2 * ev + 0.5 * ev;
+    expect(result).toBeCloseTo(correct, 4);
+  });
 });

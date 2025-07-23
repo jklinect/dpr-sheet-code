@@ -7,19 +7,25 @@
  * @param {number} [maxReroll=sides / 2] - Optional. Specifies what the
  *     maximum value is that gets re-rolled.
  * @param {number} [count=1] - Optional. The number of dice to re-roll.
+ * @param {number} [rerollValue=undefined] - Optional. The value to re-roll
+ *     with. If undefined, the expected value of the die is used.
  * @returns {number} The expected value of the re-rolled die.
  */
 export const getEvRerolled = (
   sides: number,
   incremental: boolean = false,
   maxReroll: number = sides / 2,
-  count: number = 1
+  count: number = 1,
+  rerollValue: number = undefined
 ): number => {
   const summer = (x: number) => (x > 1 ? x + summer(x - 1) : 1);
   const expected = (sides + 1) / 2;
-  const rerollChance = maxReroll / sides;
+  const rerollEv = rerollValue || expected;
+  const rerollChance = maxReroll < 1 ? maxReroll : maxReroll / sides;
   const rerolled =
-    rerollChance * expected + (1 / sides) * (summer(sides) - summer(maxReroll));
+    rerollChance * rerollEv +
+    (1 / sides) *
+      (summer(sides) - summer(maxReroll < 1 ? maxReroll * sides : maxReroll));
   return count * (incremental ? rerolled - expected : rerolled);
 };
 
@@ -38,8 +44,10 @@ export const getEvRerolled = (
  *     damage die to critical hits.
  * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice
  *     to re-roll. Include critical damage dice in this count.
- * @param {number} [rerolledDamageDieCount=undefined] - Optional. The highest
+ * @param {number} [rerolledDamageDieFindValue=undefined] - Optional. The highest
  *     value to re-roll damage dice on.
+ * @param {number} [rerolledDamageDieReplaceValue=undefined] - Optional. The value
+ *     to replace the re-rolled damage die with.
  * @returns {number} The expected value of the damage dice.
  */
 export const parseDamage = (
@@ -49,7 +57,8 @@ export const parseDamage = (
   maxOnly: boolean = false,
   extraCriticals: number = 0,
   rerolledDamageDieCount: number = 0,
-  rerolledDamageDieValue: number = undefined
+  rerolledDamageDieFindValue: number = undefined,
+  rerolledDamageDieReplaceValue: number = undefined
 ): number => {
   let match: RegExpExecArray;
   let roll = 0;
@@ -63,13 +72,14 @@ export const parseDamage = (
     if (match[3]) {
       const sides = parseInt(match[3]);
       const damage = minOnly ? 1 : maxOnly ? sides : (sides + 1) / 2;
-      const diceCount = critical ? (extraCriticals + 2) * count : count;
+      const diceCount = critical ? 2 * count + extraCriticals : count;
       value = diceCount * damage;
       value += getEvRerolled(
         sides,
         true,
-        rerolledDamageDieValue || sides / 2,
-        Math.min(diceCount, rerolledDamageDieCount)
+        rerolledDamageDieFindValue || sides / 2,
+        Math.min(diceCount, rerolledDamageDieCount),
+        rerolledDamageDieReplaceValue
       );
     } else {
       value = count;
@@ -200,8 +210,12 @@ export const calculateToHit = (
  *     damage die to critical hits.
  * @param {number} [rerolledDamageDieCount=0] - Optional. The # of damage dice
  *     to re-roll. Include critical damage dice.
- * @param {number} [rerolledDamageDieValue=undefined] - Optional. The highest
+ * @param {number} [rerolledDamageDieFindValue=undefined] - Optional. The highest
  *     value to re-roll damage dice on.
+ * @param {number} [rerolledDamageDieReplaceValue=undefined] - Optional. The value
+ *     to replace the re-rolled damage die with.
+ * @param {number} [missDamage=0] - Optional. The damage to apply on attack
+ *     miss, defaults to 0.
  * @returns {number} The given damage as described by the parameters
  */
 // eslint-disable-next-line camelcase
@@ -222,7 +236,9 @@ export const calculate_dpr = (
   elvenAccuracy: boolean = false,
   extraCriticals: number = 0,
   rerolledDamageDieCount: number = 0,
-  rerolledDamageDieValue: number = undefined
+  rerolledDamageDieFindValue: number = undefined,
+  rerolledDamageDieReplaceValue: number = undefined,
+  missDamage: number = 0
 ): number => {
   const critDamage = parseDamage(
     attackDamage,
@@ -231,7 +247,8 @@ export const calculate_dpr = (
     maxDmg,
     extraCriticals,
     rerolledDamageDieCount,
-    rerolledDamageDieValue
+    rerolledDamageDieFindValue,
+    rerolledDamageDieReplaceValue
   );
   const baseDamage = parseDamage(
     attackDamage,
@@ -240,7 +257,8 @@ export const calculate_dpr = (
     maxDmg,
     0,
     rerolledDamageDieCount,
-    rerolledDamageDieValue
+    rerolledDamageDieFindValue,
+    rerolledDamageDieReplaceValue
   );
   const perAttackCritBonus = parseDamage(
     extraAttackDamage,
@@ -287,7 +305,7 @@ export const calculate_dpr = (
   const extraTurnToHit = parseDamage(extraTurnModifier, false, minDmg, maxDmg);
   let dpr = 0.0;
   const expectedAc = parseInt(challengeAc);
-  // dpr = (crit damage * crit chance) + (normal damage * normal chance)
+  // dpr = (crit damage * crit chance) + (normal damage * normal chance) + (miss damage * miss chance)
   const toCritChance = calculateToCrit(
     advantage,
     disadvantage,
@@ -302,9 +320,11 @@ export const calculate_dpr = (
     minCrit,
     elvenAccuracy
   );
+  let toMissChance: number = 1 - toHitChance - toCritChance;
   dpr =
-    (critDamage + perAttackCritBonus + perTurnCritBonus) * toCritChance +
-    (baseDamage + perAttackBonus + perTurnBonus) * toHitChance;
+    toCritChance * (critDamage + perAttackCritBonus + perTurnCritBonus) +
+    toHitChance * (baseDamage + perAttackBonus + perTurnBonus) +
+    toMissChance * missDamage;
   // subsequent attacks (no extraTurnToHit applied)
   if (--numAttacks > 0) {
     toHitChance = calculateToHit(
@@ -315,10 +335,12 @@ export const calculate_dpr = (
       minCrit,
       elvenAccuracy
     );
+    toMissChance = 1 - toHitChance - toCritChance;
     dpr +=
       numAttacks *
-      ((critDamage + perAttackCritBonus) * toCritChance +
-        (baseDamage + perAttackBonus) * toHitChance);
+      (toCritChance * (critDamage + perAttackCritBonus) +
+        toHitChance * (baseDamage + perAttackBonus) +
+        toMissChance * missDamage);
   }
   return dpr;
 };

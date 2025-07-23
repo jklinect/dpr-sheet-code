@@ -62,4 +62,22 @@ describe("getEvRerolled", () => {
       expect(result).toBe(gwDice[d]);
     }
   });
+
+  it("handle great weapon master feat (phb 2024) re-rolls: {1, 2} -> {3, 3}", () => {
+    const actual = getEvRerolled(8, false, 2, undefined, 3);
+    const expected = (3 + 3 + 3 + 4 + 5 + 6 + 7 + 8) / 8;
+    expect(actual).toBe(expected);
+  });
+
+  it("handle great weapon master feat (phb 2024) re-rolls incrementally", () => {
+    const actual = getEvRerolled(8, true, 2, undefined, 3);
+    const expected = (3 + 3 + 3 + 4 + 5 + 6 + 7 + 8) / 8 - (8 + 1) / 2;
+    expect(actual).toBe(expected);
+  });
+
+  it("handle percentage rerolls instead of whole face #s", () => {
+    const actual = getEvRerolled(8, false, 0.5);
+    const expected = (4 * 4.5 + 5 + 6 + 7 + 8) / 8;
+    expect(actual).toBe(expected);
+  });
 });
