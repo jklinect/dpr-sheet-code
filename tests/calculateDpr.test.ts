@@ -444,4 +444,28 @@ describe("calculateDpr", () => {
     const correct = 0.05 * 2 * ev + 0.5 * ev;
     expect(result).toBeCloseTo(correct, 4);
   });
+
+  it("handle damage re-roll on all damage fields", () => {
+    const result = calculateDpr(
+      1, // # attacks
+      0, // to-hit
+      "1d4", // attack damage
+      "1d4", // extra per-hit damage
+      "1d4", // extra per-turn damage
+      "", // extra to-hit per-hit
+      "", // extra to-hit per-turn
+      "10", // challenge ac
+      false, // min damage on dice rolls
+      false, // max damage on dice rolls
+      false, // advantage on dice rolls
+      false, // disadvantage on dice rolls
+      20, // crit range
+      false, // elven advantage
+      0, // extra criticals
+      100 // # of damage die to reroll
+    );
+    const ev = 3 * ((2.5 + 2.5 + 3 + 4) / 4);
+    const correct = 0.05 * 2 * ev + 0.5 * ev;
+    expect(result).toBeCloseTo(correct, 4);
+  });
 });
