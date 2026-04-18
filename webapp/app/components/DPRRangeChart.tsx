@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import type { ChartData, ChartOptions, Plugin } from "chart.js";
 import { Line } from "react-chartjs-2";
 import {
@@ -61,7 +60,11 @@ const rangeShadePlugin: Plugin<"line"> = {
 };
 
 // eslint-disable-next-line require-jsdoc
-export default function DPRRangeChart({ data, challengeAc }: DPRRangeChartProps) {
+export default function DPRRangeChart({
+  data,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  challengeAc: _challengeAc,
+}: DPRRangeChartProps) {
   if (!data.labels?.length) return null;
 
   const options: ChartOptions<"line"> = {

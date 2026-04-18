@@ -1,27 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
-
-export interface FormValues {
-  numAttacks: number;
-  toHit: number;
-  attackDamage: string;
-  extraAttackDamage: string;
-  extraTurnDamage: string;
-  extraAttackModifier: string;
-  extraTurnModifier: string;
-  challengeAc: string;
-  level: number;
-  minDmg: boolean;
-  maxDmg: boolean;
-  minCrit: number;
-  extraCriticals: number;
-  rerolledDamageDieCount: number;
-  rerolledDamageDieFindValue: string;
-  rerolledDamageDieReplaceValue: string;
-  missDamage: number;
-  characterName: string;
-}
+import { useState, useEffect, useRef, useMemo } from "react";
+import { FormValues } from "@/types";
 
 interface DPRFormProps {
   values: FormValues;
@@ -54,7 +34,16 @@ const sectionTitleClass =
   "col-span-full text-sm font-semibold text-gray-800 mt-4 pb-1 border-b border-gray-200";
 
 // eslint-disable-next-line require-jsdoc
-function AutocompleteInput({ value, onChange, configs, placeholder, label, onDelete, onSelect, onDeleteItem }: {
+function AutocompleteInput({
+  value,
+  onChange,
+  configs,
+  placeholder,
+  label,
+  onDelete,
+  onSelect,
+  onDeleteItem,
+}: {
   value: string;
   onChange: (v: string) => void;
   configs: { id: string; compositeKey: string }[];
@@ -82,7 +71,7 @@ function AutocompleteInput({ value, onChange, configs, placeholder, label, onDel
   const filtered = useMemo(() => {
     if (!query.trim()) return configs;
     const q = query.toLowerCase();
-    return configs.filter(c => c.compositeKey.toLowerCase().includes(q));
+    return configs.filter((c) => c.compositeKey.toLowerCase().includes(q));
   }, [configs, query]);
 
   const displayValue = query || value;
@@ -94,7 +83,11 @@ function AutocompleteInput({ value, onChange, configs, placeholder, label, onDel
         <input
           type="text"
           value={displayValue}
-          onChange={(e) => { setQuery(e.target.value); setShowDropdown(true); onChange(e.target.value); }}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setShowDropdown(true);
+            onChange(e.target.value);
+          }}
           onFocus={() => configs.length > 0 && setShowDropdown(true)}
           placeholder={placeholder}
           className={inputClass}
@@ -111,17 +104,28 @@ function AutocompleteInput({ value, onChange, configs, placeholder, label, onDel
       </div>
       {showDropdown && filtered.length > 0 && (
         <div className="absolute z-10 mt-1 w-full max-h-64 overflow-y-auto rounded border border-gray-200 bg-white shadow-lg">
-          {filtered.map(c => (
-            <div key={c.id} className="flex items-center justify-between px-3 py-1.5 text-sm hover:bg-gray-50">
+          {filtered.map((c) => (
+            <div
+              key={c.id}
+              className="flex items-center justify-between px-3 py-1.5 text-sm hover:bg-gray-50"
+            >
               <button
-                onClick={() => { onSelect?.(c.id, c.compositeKey); onChange(c.compositeKey); setQuery(""); setShowDropdown(false); }}
+                onClick={() => {
+                  onSelect?.(c.id, c.compositeKey);
+                  onChange(c.compositeKey);
+                  setQuery("");
+                  setShowDropdown(false);
+                }}
                 className="flex-1 text-left"
               >
                 {c.compositeKey}
               </button>
               {onDeleteItem && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); onDeleteItem(c.id); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteItem(c.id);
+                  }}
                   className="ml-2 flex h-5 w-5 items-center justify-center rounded text-gray-400 hover:bg-gray-200 hover:text-red-500"
                   title="Delete"
                 >
@@ -137,7 +141,25 @@ function AutocompleteInput({ value, onChange, configs, placeholder, label, onDel
 }
 
 // eslint-disable-next-line require-jsdoc
-export default function DPRForm({ values, onChange, moveConfigs, charNameSuggestions, loadedMoveName, loadedConfigId, onLoadConfig, onSaveConfig, onDeleteConfig, onMoveDelete, onCharNameDelete, isDirty, onClearLoadedMove, onResetFields, onClearForm, resetKey }: DPRFormProps) {
+export default function DPRForm({
+  values,
+  onChange,
+  moveConfigs,
+  charNameSuggestions,
+  loadedMoveName,
+  loadedConfigId,
+  onLoadConfig,
+  onSaveConfig,
+  onDeleteConfig,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onMoveDelete: _onMoveDelete,
+  onCharNameDelete,
+  isDirty,
+  onClearLoadedMove,
+  onResetFields,
+  onClearForm,
+  resetKey,
+}: DPRFormProps) {
   const set = (field: keyof FormValues, value: number | string | boolean) => {
     onChange({ ...values, [field]: value });
   };
@@ -221,23 +243,28 @@ export default function DPRForm({ values, onChange, moveConfigs, charNameSuggest
   // Always include currently loaded config in dropdown so it can be deleted even if filtered out
   const moveConfigsWithLoaded = useMemo(() => {
     if (!loadedConfigId) return moveConfigs;
-    const exists = moveConfigs.some(c => c.id === loadedConfigId);
+    const exists = moveConfigs.some((c) => c.id === loadedConfigId);
     if (exists) return moveConfigs;
     // Loaded config was renamed/deleted from under us — still show it for delete access
-    return [{ id: loadedConfigId, compositeKey: loadedMoveName ?? '' }, ...moveConfigs];
+    return [
+      { id: loadedConfigId, compositeKey: loadedMoveName ?? "" },
+      ...moveConfigs,
+    ];
   }, [moveConfigs, loadedConfigId, loadedMoveName]);
 
   const filteredMoves = useMemo(() => {
     if (!moveQuery.trim()) return moveConfigsWithLoaded;
     const q = moveQuery.toLowerCase();
-    return moveConfigsWithLoaded.filter(c => c.compositeKey.toLowerCase().includes(q));
+    return moveConfigsWithLoaded.filter((c) =>
+      c.compositeKey.toLowerCase().includes(q)
+    );
   }, [moveConfigsWithLoaded, moveQuery]);
 
   const moveDisplayValue = moveLocalValue ?? loadedMoveName ?? moveQuery;
 
   // Character name suggestions as autocomplete configs
-  const charSuggestions = useMemo(() =>
-    charNameSuggestions.map(name => ({ id: name, compositeKey: name })),
+  const charSuggestions = useMemo(
+    () => charNameSuggestions.map((name) => ({ id: name, compositeKey: name })),
     [charNameSuggestions]
   );
 
@@ -277,7 +304,8 @@ export default function DPRForm({ values, onChange, moveConfigs, charNameSuggest
             configs={filteredMoves}
             label="Move Name"
             onDeleteItem={onDeleteConfig}
-            onSelect={(id, compositeKey) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            onSelect={(id, _compositeKey) => {
               // Clear local state so display comes from loaded config, not stale locals
               setMoveLocalValue(undefined);
               setMoveQuery("");
@@ -341,14 +369,19 @@ export default function DPRForm({ values, onChange, moveConfigs, charNameSuggest
           {numField("extraCriticals", "Extra Critical Dice")}
           {numField("missDamage", "Miss Damage")}
         </div>
-        <p className="text-xs font-semibold text-gray-700 mt-3 pb-1 border-b border-gray-100">Reroll</p>
+        <p className="text-xs font-semibold text-gray-700 mt-3 pb-1 border-b border-gray-100">
+          Reroll
+        </p>
         <div className="grid grid-cols-3 gap-3">
           {numField("rerolledDamageDieCount", "# Dice to Reroll")}
           {textField(
             "rerolledDamageDieFindValue",
             "Highest Face to Reroll (empty = auto)"
           )}
-          {textField("rerolledDamageDieReplaceValue", "Replace Value (optional)")}
+          {textField(
+            "rerolledDamageDieReplaceValue",
+            "Replace Value (optional)"
+          )}
         </div>
       </div>
     </div>

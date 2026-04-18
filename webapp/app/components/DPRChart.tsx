@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import type { ChartData, ChartOptions, Plugin } from "chart.js";
 import { Line } from "react-chartjs-2";
 import {
@@ -78,7 +78,12 @@ const expectedDprPlugin: Plugin<"line"> = {
       const y1x = scales.y.getPixelForValue(expected1x);
       ctx.save();
       ctx.fillStyle = "rgba(239, 68, 68, 0.15)";
-      ctx.fillRect(chartArea.left, y1x, chartArea.right - chartArea.left, chartArea.bottom - y1x);
+      ctx.fillRect(
+        chartArea.left,
+        y1x,
+        chartArea.right - chartArea.left,
+        chartArea.bottom - y1x
+      );
       ctx.restore();
     }
 
@@ -88,7 +93,12 @@ const expectedDprPlugin: Plugin<"line"> = {
       const y2x = scales.y.getPixelForValue(expected2x);
       ctx.save();
       ctx.fillStyle = "rgba(34, 197, 94, 0.15)";
-      ctx.fillRect(chartArea.left, y2x, chartArea.right - chartArea.left, y1x - y2x);
+      ctx.fillRect(
+        chartArea.left,
+        y2x,
+        chartArea.right - chartArea.left,
+        y1x - y2x
+      );
       ctx.restore();
     }
 
@@ -144,7 +154,10 @@ export default function DPRChart({ data, challengeAc, level }: DPRChartProps) {
   }, [challengeAc, level]);
 
   const expected2x = (expectedDprByLevel[level] ?? 0) * 2;
-  const dataMax = Math.max(0, ...data.datasets.flatMap(d => d.data as number[]));
+  const dataMax = Math.max(
+    0,
+    ...data.datasets.flatMap((d) => d.data as number[])
+  );
   const yMax = Math.ceil(Math.max(dataMax, expected2x) * 1.1);
 
   const options: ChartOptions<"line"> = {
@@ -164,14 +177,21 @@ export default function DPRChart({ data, challengeAc, level }: DPRChartProps) {
       y: {
         title: { display: true, text: "DPR" },
         beginAtZero: true,
-        max: Math.ceil(Math.max(yMax, ...data.datasets.flatMap(d => d.data as number[])) * 1.05),
+        max: Math.ceil(
+          Math.max(yMax, ...data.datasets.flatMap((d) => d.data as number[])) *
+            1.05
+        ),
       },
     },
   };
 
   return (
     <div className="h-[360px] w-full">
-      <Line options={options} data={data} plugins={[acLinePlugin, expectedDprPlugin]} />
+      <Line
+        options={options}
+        data={data}
+        plugins={[acLinePlugin, expectedDprPlugin]}
+      />
     </div>
   );
 }

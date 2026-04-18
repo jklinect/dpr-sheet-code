@@ -2,12 +2,12 @@
 
 import { useState, useMemo, useEffect } from "react";
 import React from "react";
-import DPRForm, { FormValues } from "./components/DPRForm";
+import DPRForm from "./components/DPRForm";
+import { FormValues } from "@/types";
 import DPRChart from "./components/DPRChart";
 import DPRRangeChart from "./components/DPRRangeChart";
-import DPRTable, { RankedTable } from "./components/DPRTable";
+import { RankedTable } from "./components/DPRTable";
 import { calculateDpr } from "@/lib/calc";
-import { listConfigs, saveConfig as saveConfigToStorage, loadConfig as loadConfigFromStorage, deleteConfig as deleteConfigFromStorage, SavedConfig } from "@/lib/storage";
 import type { ChartData } from "chart.js";
 
 interface TabBarProps {
@@ -40,6 +40,13 @@ function TabBar({ tabs }: TabBarProps) {
   );
 }
 
+interface SavedConfig {
+  id: string;
+  name: string;
+  values: FormValues;
+  createdAt: number;
+}
+
 const defaultValues: FormValues = {
   numAttacks: 1,
   toHit: 0,
@@ -65,7 +72,8 @@ const defaultValues: FormValues = {
 export default function Home() {
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [configs, setConfigs] = useState<SavedConfig[]>([]);
-  const [lastCleanValues, setLastCleanValues] = useState<FormValues>(defaultValues);
+  const [lastCleanValues, setLastCleanValues] =
+    useState<FormValues>(defaultValues);
   const [loadedMoveName, setLoadedMoveName] = useState<string | undefined>();
   const [loadedConfigId, setLoadedConfigId] = useState<string | undefined>();
   const [showSaved, setShowSaved] = useState(false);
@@ -75,51 +83,80 @@ export default function Home() {
   // Load config list on mount (client-side only)
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setConfigs(listConfigs());
+    fetch("/api/configs")
+      .then((res) => res.json())
+      .then(setConfigs)
+      .catch(console.error);
   }, []);
 
-  const handleSaveConfig = (name: string, characterName: string) => {
-    saveConfigToStorage(name, values);
+  const refreshConfigs = () => {
+    fetch("/api/configs")
+      .then((res) => res.json())
+      .then(setConfigs)
+      .catch(console.error);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleSaveConfig = async (name: string, _characterName: string) => {
+    await fetch("/api/configs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, values }),
+    });
     setLastCleanValues(values);
     setLoadedMoveName(undefined);
     setLoadedConfigId(undefined);
     setShowSaved(true);
     setTimeout(() => setShowSaved(false), 1500);
-    setConfigs(listConfigs());
+    refreshConfigs();
   };
 
-  const handleLoadConfig = (id: string) => {
-    const config = loadConfigFromStorage(id);
-    if (config) {
+  const handleLoadConfig = async (id: string) => {
+    try {
+      const res = await fetch(`/api/configs/${encodeURIComponent(id)}`);
+      if (!res.ok) return;
+      const config: SavedConfig = await res.json();
       setValues(config.values);
       setLastCleanValues({ ...config.values });
       setLoadedMoveName(config.name);
       setLoadedConfigId(id);
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const handleDeleteConfig = (id: string) => {
-    deleteConfigFromStorage(id);
+  const handleDeleteConfig = async (id: string) => {
+    await fetch(`/api/configs/${encodeURIComponent(id)}`, { method: "DELETE" });
     if (loadedConfigId === id) {
       setLoadedMoveName(undefined);
       setLoadedConfigId(undefined);
     }
     setShowDeleted(true);
     setTimeout(() => setShowDeleted(false), 1500);
-    setConfigs(listConfigs());
+    refreshConfigs();
   };
 
-  const handleMoveDelete = (hasLoadedConfig: boolean, moveName?: string) => {
+  const handleMoveDelete = async (
+    hasLoadedConfig: boolean,
+    moveName?: string
+  ) => {
     if (hasLoadedConfig && loadedConfigId) {
-      deleteConfigFromStorage(loadedConfigId);
+      await fetch(`/api/configs/${encodeURIComponent(loadedConfigId)}`, {
+        method: "DELETE",
+      });
       setLoadedMoveName(undefined);
       setLoadedConfigId(undefined);
     } else if (moveName?.trim()) {
       // Delete any saved config matching the typed move name
-      const allConfigs = listConfigs();
+      const allConfigs = await fetch("/api/configs").then((res) => res.json());
       for (const c of allConfigs) {
-        if (c.name === moveName.trim() || `${c.values.characterName} - ${c.name}` === moveName.trim()) {
-          deleteConfigFromStorage(c.id);
+        if (
+          c.name === moveName.trim() ||
+          `${c.values.characterName} - ${c.name}` === moveName.trim()
+        ) {
+          await fetch(`/api/configs/${encodeURIComponent(c.id)}`, {
+            method: "DELETE",
+          });
           if (loadedConfigId === c.id) {
             setLoadedMoveName(undefined);
             setLoadedConfigId(undefined);
@@ -133,12 +170,12 @@ export default function Home() {
     const charName = values.characterName;
     setValues({ ...defaultValues, characterName: charName });
     setLastCleanValues(defaultValues);
-    setConfigs(listConfigs());
-    setDeleteKey(k => k + 1);
+    refreshConfigs();
+    setDeleteKey((k) => k + 1);
   };
 
-  const handleDeleteProfile = (id: string) => {
-    deleteConfigFromStorage(id);
+  const handleDeleteProfile = async (id: string) => {
+    await fetch(`/api/configs/${encodeURIComponent(id)}`, { method: "DELETE" });
     if (loadedConfigId === id) {
       setLoadedMoveName(undefined);
       setLoadedConfigId(undefined);
@@ -147,21 +184,30 @@ export default function Home() {
     setTimeout(() => setShowDeleted(false), 1500);
     setValues(defaultValues);
     setLastCleanValues(defaultValues);
-    setConfigs(listConfigs());
-    setDeleteKey(k => k + 1);
+    refreshConfigs();
+    setDeleteKey((k) => k + 1);
   };
 
-  const handleCharNameDelete = () => {
+  const handleCharNameDelete = async () => {
     const charName = values.characterName;
     if (!charName) return;
     // Delete all configs for this character name
-    const toDelete = listConfigs().filter(c => c.values.characterName === charName);
-    toDelete.forEach(c => deleteConfigFromStorage(c.id));
+    const allConfigs: SavedConfig[] = await fetch("/api/configs").then((res) =>
+      res.json()
+    );
+    const toDelete = allConfigs.filter(
+      (c) => c.values.characterName === charName
+    );
+    for (const c of toDelete) {
+      await fetch(`/api/configs/${encodeURIComponent(c.id)}`, {
+        method: "DELETE",
+      });
+    }
     setValues({ ...defaultValues, characterName: "" });
     setLastCleanValues(defaultValues);
     setLoadedMoveName(undefined);
     setLoadedConfigId(undefined);
-    setConfigs(listConfigs());
+    refreshConfigs();
   };
 
   const handleResetFields = (newCharName: string) => {
@@ -179,10 +225,30 @@ export default function Home() {
     const acs = Array.from({ length: 26 }, (_, i) => i + 5); // AC 5-30
 
     const conditions = [
-      { label: "Normal", advantage: false, disadvantage: false, elvenAccuracy: false },
-      { label: "Advantage", advantage: true, disadvantage: false, elvenAccuracy: false },
-      { label: "Disadvantage", advantage: false, disadvantage: true, elvenAccuracy: false },
-      { label: "Elven Accuracy", advantage: false, disadvantage: false, elvenAccuracy: true },
+      {
+        label: "Normal",
+        advantage: false,
+        disadvantage: false,
+        elvenAccuracy: false,
+      },
+      {
+        label: "Advantage",
+        advantage: true,
+        disadvantage: false,
+        elvenAccuracy: false,
+      },
+      {
+        label: "Disadvantage",
+        advantage: false,
+        disadvantage: true,
+        elvenAccuracy: false,
+      },
+      {
+        label: "Elven Accuracy",
+        advantage: false,
+        disadvantage: false,
+        elvenAccuracy: true,
+      },
     ];
 
     return {
@@ -258,40 +324,94 @@ export default function Home() {
       datasets: [
         {
           label: "Normal",
-          data: acs.map((ac) => calculateDpr(
-            values.numAttacks, values.toHit, values.attackDamage,
-            values.extraAttackDamage, values.extraTurnDamage,
-            values.extraAttackModifier, values.extraTurnModifier,
-            String(ac), false, false, false, false,
-            values.minCrit, false, values.extraCriticals,
-            values.rerolledDamageDieCount, rerollFindValue, rerollReplaceValue, values.missDamage
-          )),
-          borderColor: "#6366f1", backgroundColor: "#6366f1", tension: 0.1, pointRadius: 3,
+          data: acs.map((ac) =>
+            calculateDpr(
+              values.numAttacks,
+              values.toHit,
+              values.attackDamage,
+              values.extraAttackDamage,
+              values.extraTurnDamage,
+              values.extraAttackModifier,
+              values.extraTurnModifier,
+              String(ac),
+              false,
+              false,
+              false,
+              false,
+              values.minCrit,
+              false,
+              values.extraCriticals,
+              values.rerolledDamageDieCount,
+              rerollFindValue,
+              rerollReplaceValue,
+              values.missDamage
+            )
+          ),
+          borderColor: "#6366f1",
+          backgroundColor: "#6366f1",
+          tension: 0.1,
+          pointRadius: 3,
         },
         {
           label: "Min Damage",
-          data: acs.map((ac) => calculateDpr(
-            values.numAttacks, values.toHit, values.attackDamage,
-            values.extraAttackDamage, values.extraTurnDamage,
-            values.extraAttackModifier, values.extraTurnModifier,
-            String(ac), true, false, false, false,
-            values.minCrit, false, values.extraCriticals,
-            values.rerolledDamageDieCount, rerollFindValue, rerollReplaceValue, values.missDamage
-          )),
-          borderColor: "#9ca3af", backgroundColor: "#9ca3af", tension: 0.1, pointRadius: 2,
+          data: acs.map((ac) =>
+            calculateDpr(
+              values.numAttacks,
+              values.toHit,
+              values.attackDamage,
+              values.extraAttackDamage,
+              values.extraTurnDamage,
+              values.extraAttackModifier,
+              values.extraTurnModifier,
+              String(ac),
+              true,
+              false,
+              false,
+              false,
+              values.minCrit,
+              false,
+              values.extraCriticals,
+              values.rerolledDamageDieCount,
+              rerollFindValue,
+              rerollReplaceValue,
+              values.missDamage
+            )
+          ),
+          borderColor: "#9ca3af",
+          backgroundColor: "#9ca3af",
+          tension: 0.1,
+          pointRadius: 2,
           borderDash: [5, 3],
         },
         {
           label: "Max Damage",
-          data: acs.map((ac) => calculateDpr(
-            values.numAttacks, values.toHit, values.attackDamage,
-            values.extraAttackDamage, values.extraTurnDamage,
-            values.extraAttackModifier, values.extraTurnModifier,
-            String(ac), false, true, false, false,
-            values.minCrit, false, values.extraCriticals,
-            values.rerolledDamageDieCount, rerollFindValue, rerollReplaceValue, values.missDamage
-          )),
-          borderColor: "#9ca3af", backgroundColor: "#9ca3af", tension: 0.1, pointRadius: 2,
+          data: acs.map((ac) =>
+            calculateDpr(
+              values.numAttacks,
+              values.toHit,
+              values.attackDamage,
+              values.extraAttackDamage,
+              values.extraTurnDamage,
+              values.extraAttackModifier,
+              values.extraTurnModifier,
+              String(ac),
+              false,
+              true,
+              false,
+              false,
+              values.minCrit,
+              false,
+              values.extraCriticals,
+              values.rerolledDamageDieCount,
+              rerollFindValue,
+              rerollReplaceValue,
+              values.missDamage
+            )
+          ),
+          borderColor: "#9ca3af",
+          backgroundColor: "#9ca3af",
+          tension: 0.1,
+          pointRadius: 2,
           borderDash: [5, 3],
         },
       ],
@@ -336,10 +456,14 @@ export default function Home() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">DPR Calculator</h1>
         {showSaved && (
-          <span className="text-sm text-green-600 font-medium animate-pulse mr-3">✓ Profile saved</span>
+          <span className="text-sm text-green-600 font-medium animate-pulse mr-3">
+            ✓ Profile saved
+          </span>
         )}
         {showDeleted && (
-          <span className="text-sm text-red-500 font-medium animate-pulse mr-3">✓ Profile deleted</span>
+          <span className="text-sm text-red-500 font-medium animate-pulse mr-3">
+            ✓ Profile deleted
+          </span>
         )}
         <div className="rounded-lg bg-indigo-50 px-4 py-2 text-indigo-700">
           <span className="text-xs font-medium">Current DPR:</span>{" "}
@@ -355,16 +479,27 @@ export default function Home() {
           <DPRForm
             values={values}
             onChange={setValues}
-            moveConfigs={configs.filter(c => !values.characterName || c.values.characterName === values.characterName)
-              .map(c => ({ id: c.id, compositeKey: c.name }))}
-            charNameSuggestions={[...new Set(configs.map(c => c.values.characterName).filter(Boolean))]}
+            moveConfigs={configs
+              .filter(
+                (c) =>
+                  !values.characterName ||
+                  c.values.characterName === values.characterName
+              )
+              .map((c) => ({ id: c.id, compositeKey: c.name }))}
+            charNameSuggestions={[
+              ...new Set(
+                configs.map((c) => c.values.characterName).filter(Boolean)
+              ),
+            ]}
             loadedMoveName={loadedMoveName}
             onLoadConfig={handleLoadConfig}
             onSaveConfig={handleSaveConfig}
             onDeleteConfig={handleDeleteConfig}
             onMoveDelete={handleMoveDelete}
             onCharNameDelete={handleCharNameDelete}
-            onClearLoadedMove={() => { setLoadedMoveName(undefined); }}
+            onClearLoadedMove={() => {
+              setLoadedMoveName(undefined);
+            }}
             onResetFields={handleResetFields}
             isDirty={JSON.stringify(values) !== JSON.stringify(lastCleanValues)}
             resetKey={deleteKey}
@@ -373,40 +508,63 @@ export default function Home() {
               setLastCleanValues(defaultValues);
               setLoadedMoveName(undefined);
               setLoadedConfigId(undefined);
-              setDeleteKey(k => k + 1); // flush local move state
+              setDeleteKey((k) => k + 1); // flush local move state
             }}
           />
         </aside>
 
         {/* Right - tabbed interface */}
         <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <TabBar tabs={[
-            { label: "Graph", content: (
-              <>
-                <h2 className="mb-3 text-sm font-semibold text-gray-700">
-                  DPR vs Armor Class
-                </h2>
-                <DPRChart
-                  data={chartData}
-                  challengeAc={parseInt(values.challengeAc) || 10}
-                  level={values.level}
-                />
-                <h2 className="mb-3 text-sm font-semibold text-gray-700">
-                  Expected Damage Range vs Armor Class
-                </h2>
-                <DPRRangeChart
-                  data={rangeChartData}
-                  challengeAc={parseInt(values.challengeAc) || 10}
-                />
-              </>
-            )},
-            { label: "Top 25 - Damage", content: (
-              <RankedTable configs={configs} level={values.level} title="Top 25 - Damage" metric="dpr" onDelete={handleDeleteProfile} />
-            )},
-            { label: "Top 25 - Efficiency", content: (
-              <RankedTable configs={configs} level={values.level} title="Top 25 - Efficiency" metric="multiple" onDelete={handleDeleteProfile} />
-            )},
-          ]} />
+          <TabBar
+            tabs={[
+              {
+                label: "Graph",
+                content: (
+                  <>
+                    <h2 className="mb-3 text-sm font-semibold text-gray-700">
+                      DPR vs Armor Class
+                    </h2>
+                    <DPRChart
+                      data={chartData}
+                      challengeAc={parseInt(values.challengeAc) || 10}
+                      level={values.level}
+                    />
+                    <h2 className="mb-3 text-sm font-semibold text-gray-700">
+                      Expected Damage Range vs Armor Class
+                    </h2>
+                    <DPRRangeChart
+                      data={rangeChartData}
+                      challengeAc={parseInt(values.challengeAc) || 10}
+                    />
+                  </>
+                ),
+              },
+              {
+                label: "Top 25 - Damage",
+                content: (
+                  <RankedTable
+                    configs={configs}
+                    level={values.level}
+                    title="Top 25 - Damage"
+                    metric="dpr"
+                    onDelete={handleDeleteProfile}
+                  />
+                ),
+              },
+              {
+                label: "Top 25 - Efficiency",
+                content: (
+                  <RankedTable
+                    configs={configs}
+                    level={values.level}
+                    title="Top 25 - Efficiency"
+                    metric="multiple"
+                    onDelete={handleDeleteProfile}
+                  />
+                ),
+              },
+            ]}
+          />
         </section>
       </div>
     </main>

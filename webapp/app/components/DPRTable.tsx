@@ -16,20 +16,40 @@ interface DPRTableProps {
 // eslint-disable-next-line require-jsdoc
 function Chevron({ dir }: { dir: SortDir }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      {dir === "asc" ? <path d="m18 15-6-6-6 6"/> : <path d="m6 9 6 6 6-6"/>}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      {dir === "asc" ? <path d="m18 15-6-6-6 6" /> : <path d="m6 9 6 6 6-6" />}
     </svg>
   );
 }
 
 // eslint-disable-next-line require-jsdoc
-function RankedTableInner({ configs, level, title, metric, onDelete }: { configs: SavedConfig[]; level: number; title: string; metric: "dpr" | "multiple"; onDelete?: (id: string) => void }) {
+function RankedTableInner({
+  configs,
+  level,
+  title,
+  metric,
+  onDelete,
+}: {
+  configs: SavedConfig[];
+  level: number;
+  title: string;
+  metric: "dpr" | "multiple";
+  onDelete?: (id: string) => void;
+}) {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const expectedDpr = expectedDprByLevel[level] ?? 0;
 
   const rows = useMemo(() => {
-    return configs.map(c => {
+    return configs.map((c) => {
       const ac = parseInt(c.values.challengeAc) || 10;
       const rerollFindValue = c.values.rerolledDamageDieFindValue
         ? parseFloat(c.values.rerolledDamageDieFindValue) || undefined
@@ -62,20 +82,27 @@ function RankedTableInner({ configs, level, title, metric, onDelete }: { configs
 
       const multiple = expectedDpr > 0 ? dpr / expectedDpr : 0;
 
-      return { id: c.id, name: c.name, characterName: c.values.characterName, level: c.values.level, dpr, multiple };
+      return {
+        id: c.id,
+        name: c.name,
+        characterName: c.values.characterName,
+        level: c.values.level,
+        dpr,
+        multiple,
+      };
     });
   }, [configs, expectedDpr]);
 
   const sortedRows = useMemo(() => {
     const sorted = [...rows].sort((a, b) => {
-      let cmp = metric === "dpr" ? a.dpr - b.dpr : a.multiple - b.multiple;
+      const cmp = metric === "dpr" ? a.dpr - b.dpr : a.multiple - b.multiple;
       return sortDir === "asc" ? cmp : -cmp;
     });
     return sorted.slice(0, 25);
   }, [rows, sortDir, metric]);
 
   const handleSort = () => {
-    setSortDir(d => d === "asc" ? "desc" : "asc");
+    setSortDir((d) => (d === "asc" ? "desc" : "asc"));
   };
 
   if (configs.length === 0) return null;
@@ -88,18 +115,33 @@ function RankedTableInner({ configs, level, title, metric, onDelete }: { configs
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider">Character</th>
-            <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider">Level</th>
-            <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider">Move</th>
-            <th onClick={handleSort} className="cursor-pointer px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider hover:bg-gray-50">
-              {label}<Chevron dir={sortDir}/>
+            <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider">
+              Character
+            </th>
+            <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider">
+              Level
+            </th>
+            <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider">
+              Move
+            </th>
+            <th
+              onClick={handleSort}
+              className="cursor-pointer px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider hover:bg-gray-50"
+            >
+              {label}
+              <Chevron dir={sortDir} />
             </th>
           </tr>
         </thead>
         <tbody>
           {sortedRows.map((row, i) => (
-            <tr key={`${row.name}-${i}`} className="border-b border-gray-100 hover:bg-gray-50">
-              <td className="px-4 py-2 font-medium">{row.characterName || "-"}</td>
+            <tr
+              key={`${row.name}-${i}`}
+              className="border-b border-gray-100 hover:bg-gray-50"
+            >
+              <td className="px-4 py-2 font-medium">
+                {row.characterName || "-"}
+              </td>
               <td className="px-4 py-2">{row.level}</td>
               <td className="px-4 py-2 flex items-center gap-1">
                 {row.name}
@@ -114,7 +156,9 @@ function RankedTableInner({ configs, level, title, metric, onDelete }: { configs
                 )}
               </td>
               <td className="px-4 py-2">
-                {metric === "dpr" ? row.dpr.toFixed(2) : `${row.multiple.toFixed(2)}×`}
+                {metric === "dpr"
+                  ? row.dpr.toFixed(2)
+                  : `${row.multiple.toFixed(2)}×`}
               </td>
             </tr>
           ))}
@@ -125,8 +169,28 @@ function RankedTableInner({ configs, level, title, metric, onDelete }: { configs
 }
 
 // eslint-disable-next-line require-jsdoc
-export function RankedTable({ configs, level, title, metric, onDelete }: { configs: SavedConfig[]; level: number; title: string; metric: "dpr" | "multiple"; onDelete?: (id: string) => void }) {
-  return <RankedTableInner configs={configs} level={level} title={title} metric={metric} onDelete={onDelete} />;
+export function RankedTable({
+  configs,
+  level,
+  title,
+  metric,
+  onDelete,
+}: {
+  configs: SavedConfig[];
+  level: number;
+  title: string;
+  metric: "dpr" | "multiple";
+  onDelete?: (id: string) => void;
+}) {
+  return (
+    <RankedTableInner
+      configs={configs}
+      level={level}
+      title={title}
+      metric={metric}
+      onDelete={onDelete}
+    />
+  );
 }
 
 // eslint-disable-next-line require-jsdoc
@@ -136,8 +200,18 @@ function SubTable({ configs, level }: DPRTableProps) {
   return (
     <div className="mt-6">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <RankedTableInner configs={configs} level={level} title="Top 25 - Damage" metric="dpr" />
-        <RankedTableInner configs={configs} level={level} title="Top 25 - Efficiency" metric="multiple" />
+        <RankedTableInner
+          configs={configs}
+          level={level}
+          title="Top 25 - Damage"
+          metric="dpr"
+        />
+        <RankedTableInner
+          configs={configs}
+          level={level}
+          title="Top 25 - Efficiency"
+          metric="multiple"
+        />
       </div>
     </div>
   );
