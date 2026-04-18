@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-45 -45 90 90" width="64" height="64">
+  <defs>
+    <!-- Dice body gradient -->
+    <linearGradient id="diceGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <linearGradient id="diceGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <!-- Shadow -->
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#1e1b4b" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Left die (showing 1 pip) -->
+  <g filter="url(#shadow)" transform="translate(-16, -2)">
+    <rect x="-18" y="-18" width="36" height="36" rx="5" ry="5" fill="url(#diceGrad1)" stroke="#cbd5e1" stroke-width="1.2"/>
+    <!-- Center pip -->
+    <circle cx="0" cy="0" r="4.5" fill="#6d28d9"/>
+  </g>
+
+  <!-- Right die (showing 1 pip) -->
+  <g filter="url(#shadow)" transform="translate(16, 2)">
+    <rect x="-18" y="-18" width="36" height="36" rx="5" ry="5" fill="url(#diceGrad2)" stroke="#cbd5e1" stroke-width="1.2"/>
+    <!-- Center pip -->
+    <circle cx="0" cy="0" r="4.5" fill="#6d28d9"/>
+  </g>
+</svg>
